@@ -8,6 +8,21 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Authentication routes (public, no tenant required)
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [\App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'login']);
+    Route::get('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'register']);
+    Route::get('/forgot-password', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+});
+
+// Logout (requires authentication)
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+});
+
 // Admin routes (require authentication and tenant context)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'ensuretenantactive', 'ensuresubscriptionactive'])->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
@@ -20,6 +35,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
     Route::get('activity-logs/{activityLog}', [\App\Http\Controllers\Admin\ActivityLogController::class, 'show'])->name('activity-logs.show');
     Route::delete('activity-logs/clean', [\App\Http\Controllers\Admin\ActivityLogController::class, 'clean'])->name('activity-logs.clean');
+    
+    // User Management
+    Route::post('users/{user}/force-logout', [\App\Http\Controllers\Admin\UserController::class, 'forceLogout'])->name('users.force-logout');
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 });
 
 // Subscription routes (public)

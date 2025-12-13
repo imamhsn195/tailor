@@ -16,6 +16,12 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasRoles, LogsActivity;
 
     /**
+     * The connection name for the model.
+     * For multi-tenant, this will use the tenant connection automatically
+     */
+    protected $connection = null; // null = use default (tenant connection when tenant is current)
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -24,6 +30,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_active',
     ];
 
     /**
@@ -46,6 +53,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -76,5 +84,13 @@ class User extends Authenticatable
     public function defaultBranch()
     {
         return $this->branches()->wherePivot('is_default', true)->first();
+    }
+
+    /**
+     * Get login history
+     */
+    public function loginHistory()
+    {
+        return $this->hasMany(UserLoginHistory::class);
     }
 }

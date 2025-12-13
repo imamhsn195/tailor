@@ -41,5 +41,13 @@ return [
         'married' => 'Married',
         'divorced' => 'Divorced',
     ],
+    
+    // User Status
+    'user_status' => [
+        'active' => 'Active',
+        'inactive' => 'Inactive',
+        'suspended' => 'Suspended',
+        'terminated' => 'Terminated',
+    ],
 ];
 

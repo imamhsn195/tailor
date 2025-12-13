@@ -113,5 +113,26 @@ return [
     'min' => 'Minimum value is :min',
     'max' => 'Maximum value is :max',
     'unique' => 'This value already exists',
+    
+    // Authentication
+    'login' => 'Login',
+    'logout' => 'Logout',
+    'register' => 'Register',
+    'forgot_password' => 'Forgot Password',
+    'reset_password' => 'Reset Password',
+    'remember_me' => 'Remember Me',
+    'invalid_credentials' => 'Invalid email or password',
+    'account_inactive' => 'Your account is inactive. Please contact administrator.',
+    'access_denied_ip_mac' => 'Access denied. Your IP or MAC address is not allowed.',
+    'password_reset_link_sent' => 'Password reset link has been sent to your email.',
+    'password_reset_failed' => 'Unable to send password reset link.',
+    'cannot_delete_yourself' => 'You cannot delete your own account.',
+    'user_logged_out' => 'User has been logged out successfully.',
+    'password' => 'Password',
+    'confirm_password' => 'Confirm Password',
+    'already_have_account' => 'I already have an account',
+    'forgot_password_message' => 'You forgot your password? Here you can easily retrieve a new password.',
+    'send_password_reset_link' => 'Send Password Reset Link',
+    'back_to_login' => 'Back to Login',
 ];
 

@@ -41,5 +41,13 @@ return [
         'married' => 'বিবাহিত',
         'divorced' => 'তালাকপ্রাপ্ত',
     ],
+    
+    // User Status
+    'user_status' => [
+        'active' => 'সক্রিয়',
+        'inactive' => 'নিষ্ক্রিয়',
+        'suspended' => 'স্থগিত',
+        'terminated' => 'সমাপ্ত',
+    ],
 ];
 
