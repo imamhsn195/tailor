@@ -187,6 +187,7 @@ return [
 
         /*
          * The cache key used to store all permissions.
+         * For multi-tenant, this will be prefixed with tenant ID automatically
          */
 
         'key' => 'spatie.permission.cache',

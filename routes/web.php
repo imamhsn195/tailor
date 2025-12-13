@@ -11,6 +11,10 @@ Route::get('/', function () {
 // Admin routes (require authentication and tenant context)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'ensuretenantactive', 'ensuresubscriptionactive'])->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Roles & Permissions
+    Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
+    Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class)->only(['index', 'show']);
 });
 
 // Subscription routes (public)
