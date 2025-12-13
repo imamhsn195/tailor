@@ -539,13 +539,15 @@ return [
         ['header' => 'SETTINGS'],
         [
             'text' => 'Company Settings',
-            'url' => '#',
+            'url' => 'admin/companies',
             'icon' => 'fas fa-fw fa-building',
+            'active' => ['admin/companies*'],
         ],
         [
             'text' => 'Branch Management',
-            'url' => '#',
+            'url' => 'admin/branches',
             'icon' => 'fas fa-fw fa-sitemap',
+            'active' => ['admin/branches*'],
         ],
         [
             'text' => 'User Management',

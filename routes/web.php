@@ -39,6 +39,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     // User Management
     Route::post('users/{user}/force-logout', [\App\Http\Controllers\Admin\UserController::class, 'forceLogout'])->name('users.force-logout');
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+    
+    // Company & Branch Management
+    Route::resource('companies', \App\Http\Controllers\Admin\CompanyController::class);
+    Route::resource('branches', \App\Http\Controllers\Admin\BranchController::class);
 });
 
 // Subscription routes (public)

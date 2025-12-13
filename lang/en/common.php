@@ -79,6 +79,18 @@ return [
     'users' => 'Users',
     'roles' => 'Roles',
     'permissions' => 'Permissions',
+    'companies' => 'Companies',
+    'branches' => 'Branches',
+    'company' => 'Company',
+    'branch' => 'Branch',
+    'branch_name' => 'Branch Name',
+    'invoice_name' => 'Invoice Name',
+    'company_registration_no' => 'Company Registration No',
+    'company_tin_no' => 'Company TIN No',
+    'e_bin' => 'e-BIN',
+    'bin' => 'BIN',
+    'trade_license_no' => 'Trade License No',
+    'modules' => 'Modules',
     
     // Common messages
     'no_records_found' => 'No records found',
