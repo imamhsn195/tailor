@@ -15,6 +15,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     // Roles & Permissions
     Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
     Route::resource('permissions', \App\Http\Controllers\Admin\PermissionController::class)->only(['index', 'show']);
+    
+    // Activity Logs
+    Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::get('activity-logs/{activityLog}', [\App\Http\Controllers\Admin\ActivityLogController::class, 'show'])->name('activity-logs.show');
+    Route::delete('activity-logs/clean', [\App\Http\Controllers\Admin\ActivityLogController::class, 'clean'])->name('activity-logs.clean');
 });
 
 // Subscription routes (public)

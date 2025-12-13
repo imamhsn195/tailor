@@ -557,6 +557,12 @@ return [
             'url' => '#',
             'icon' => 'fas fa-fw fa-shield-alt',
         ],
+        [
+            'text' => 'Activity Logs',
+            'url' => route('admin.activity-logs.index'),
+            'icon' => 'fas fa-fw fa-history',
+            'can' => 'report.view',
+        ],
     ],
 
     /*

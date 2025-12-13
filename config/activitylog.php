@@ -47,6 +47,7 @@ return [
      * This is the database connection that will be used by the migration and
      * the Activity model shipped with this package. In case it's not set
      * Laravel's database.default will be used instead.
+     * For multi-tenant, this will use the tenant connection automatically.
      */
-    'database_connection' => env('ACTIVITY_LOGGER_DB_CONNECTION'),
+    'database_connection' => env('ACTIVITY_LOGGER_DB_CONNECTION', null), // null = use default (tenant connection)
 ];
