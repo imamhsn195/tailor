@@ -14,3 +14,4 @@ enum UserStatus: string
     case TERMINATED = 'terminated';
 }
 
+
