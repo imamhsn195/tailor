@@ -43,6 +43,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     // Company & Branch Management
     Route::resource('companies', \App\Http\Controllers\Admin\CompanyController::class);
     Route::resource('branches', \App\Http\Controllers\Admin\BranchController::class);
+    
+    // Product Management
+    Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+    Route::resource('product-categories', \App\Http\Controllers\Admin\ProductCategoryController::class);
+    Route::resource('product-units', \App\Http\Controllers\Admin\ProductUnitController::class);
 });
 
 // Subscription routes (public)

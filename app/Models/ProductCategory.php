@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class ProductCategory extends Model
 {
@@ -13,12 +14,15 @@ class ProductCategory extends Model
 
     protected $fillable = [
         'name',
-        'code',
+        'slug',
         'description',
+        'parent_id',
+        'sort_order',
         'is_active',
     ];
 
     protected $casts = [
+        'sort_order' => 'integer',
         'is_active' => 'boolean',
     ];
 
@@ -31,12 +35,28 @@ class ProductCategory extends Model
     }
 
     /**
+     * Get parent category
+     */
+    public function parent()
+    {
+        return $this->belongsTo(ProductCategory::class, 'parent_id');
+    }
+
+    /**
+     * Get child categories
+     */
+    public function children()
+    {
+        return $this->hasMany(ProductCategory::class, 'parent_id');
+    }
+
+    /**
      * Configure activity log options
      */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'code', 'is_active'])
+            ->logOnly(['name', 'slug', 'is_active'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
