@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', env('LANDLORD_DB_CONNECTION', 'landlord')),
 
     /*
     |--------------------------------------------------------------------------
@@ -111,6 +111,44 @@ return [
             'prefix_indexes' => true,
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+        ],
+
+        /*
+         * Landlord database connection (central database for tenant management)
+         */
+        'landlord' => [
+            'driver' => env('LANDLORD_DB_DRIVER', 'mysql'),
+            'url' => env('LANDLORD_DB_URL'),
+            'host' => env('LANDLORD_DB_HOST', env('DB_HOST', '127.0.0.1')),
+            'port' => env('LANDLORD_DB_PORT', env('DB_PORT', '3306')),
+            'database' => env('LANDLORD_DB_DATABASE', 'tailor_landlord'),
+            'username' => env('LANDLORD_DB_USERNAME', env('DB_USERNAME', 'root')),
+            'password' => env('LANDLORD_DB_PASSWORD', env('DB_PASSWORD', '')),
+            'unix_socket' => env('LANDLORD_DB_SOCKET', ''),
+            'charset' => env('LANDLORD_DB_CHARSET', 'utf8mb4'),
+            'collation' => env('LANDLORD_DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+        ],
+
+        /*
+         * Tenant database connection (dynamically configured per tenant)
+         */
+        'tenant' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => '', // Will be set dynamically
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
         ],
 
     ],

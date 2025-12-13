@@ -11,6 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Tenant identification middleware (runs early to identify tenant)
+        $middleware->web(prepend: [
+            \App\Http\Middleware\IdentifyTenant::class,
+        ]);
+        
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
         ]);
