@@ -14,9 +14,9 @@ return [
     |
     */
 
-    'title' => 'AdminLTE 3',
+    'title' => 'ZAZ Co. Tailor Shop',
     'title_prefix' => '',
-    'title_postfix' => '',
+    'title_postfix' => ' | Admin Panel',
 
     /*
     |--------------------------------------------------------------------------
@@ -63,12 +63,12 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
+    'logo' => '<b>ZAZ</b> Co.',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'Admin Logo',
+    'logo_img_alt' => 'ZAZ Co. Logo',
 
     /*
     |--------------------------------------------------------------------------
@@ -257,13 +257,13 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'home',
+    'dashboard_url' => 'admin.dashboard',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
     'password_reset_url' => 'password/reset',
     'password_email_url' => 'password/email',
-    'profile_url' => false,
+    'profile_url' => 'admin.profile',
     'disable_darkmode_routes' => false,
 
     /*
@@ -316,81 +316,246 @@ return [
             'text' => 'search',
         ],
         [
-            'text' => 'blog',
-            'url' => 'admin/blog',
-            'can' => 'manage-blog',
+            'text' => 'Dashboard',
+            'url' => 'admin/dashboard',
+            'icon' => 'fas fa-fw fa-tachometer-alt',
+            'active' => ['admin/dashboard*'],
         ],
+        ['header' => 'MAIN MENU'],
         [
-            'text' => 'pages',
-            'url' => 'admin/pages',
-            'icon' => 'far fa-fw fa-file',
-            'label' => 4,
-            'label_color' => 'success',
-        ],
-        ['header' => 'account_settings'],
-        [
-            'text' => 'profile',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
-        [
-            'text' => 'multilevel',
-            'icon' => 'fas fa-fw fa-share',
+            'text' => 'Orders',
+            'icon' => 'fas fa-fw fa-shopping-cart',
             'submenu' => [
                 [
-                    'text' => 'level_one',
+                    'text' => 'New Order',
                     'url' => '#',
+                    'icon' => 'fas fa-fw fa-plus-circle',
                 ],
                 [
-                    'text' => 'level_one',
+                    'text' => 'Order List',
                     'url' => '#',
-                    'submenu' => [
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                        ],
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                            'submenu' => [
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                            ],
-                        ],
-                    ],
+                    'icon' => 'fas fa-fw fa-list',
                 ],
                 [
-                    'text' => 'level_one',
+                    'text' => 'Deliveries',
                     'url' => '#',
+                    'icon' => 'fas fa-fw fa-truck',
+                ],
+                [
+                    'text' => 'Alterations',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-edit',
                 ],
             ],
         ],
-        ['header' => 'labels'],
         [
-            'text' => 'important',
-            'icon_color' => 'red',
-            'url' => '#',
+            'text' => 'POS System',
+            'icon' => 'fas fa-fw fa-cash-register',
+            'submenu' => [
+                [
+                    'text' => 'POS Sale',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-shopping-bag',
+                ],
+                [
+                    'text' => 'Exchanges',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-exchange-alt',
+                ],
+                [
+                    'text' => 'Cancellations',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-times-circle',
+                ],
+            ],
         ],
         [
-            'text' => 'warning',
-            'icon_color' => 'yellow',
-            'url' => '#',
+            'text' => 'Products',
+            'icon' => 'fas fa-fw fa-box',
+            'submenu' => [
+                [
+                    'text' => 'Product List',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-list',
+                ],
+                [
+                    'text' => 'Categories',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-folder',
+                ],
+                [
+                    'text' => 'Barcode Management',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-barcode',
+                ],
+            ],
         ],
         [
-            'text' => 'information',
-            'icon_color' => 'cyan',
+            'text' => 'Inventory',
+            'icon' => 'fas fa-fw fa-warehouse',
+            'submenu' => [
+                [
+                    'text' => 'Stock In',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-arrow-down',
+                ],
+                [
+                    'text' => 'Stock Out',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-arrow-up',
+                ],
+                [
+                    'text' => 'Stock Transfer',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-exchange-alt',
+                ],
+                [
+                    'text' => 'Current Stock',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-clipboard-list',
+                ],
+            ],
+        ],
+        [
+            'text' => 'Factory',
+            'icon' => 'fas fa-fw fa-industry',
+            'submenu' => [
+                [
+                    'text' => 'Production Tracking',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-tasks',
+                ],
+                [
+                    'text' => 'Workers',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-users',
+                ],
+                [
+                    'text' => 'Job Assignments',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-user-check',
+                ],
+                [
+                    'text' => 'Material Management',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-boxes',
+                ],
+            ],
+        ],
+        [
+            'text' => 'HR & Payroll',
+            'icon' => 'fas fa-fw fa-user-tie',
+            'submenu' => [
+                [
+                    'text' => 'Employees',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-users',
+                ],
+                [
+                    'text' => 'Attendance',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-calendar-check',
+                ],
+                [
+                    'text' => 'Salary',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-money-bill-wave',
+                ],
+                [
+                    'text' => 'Departments',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-building',
+                ],
+            ],
+        ],
+        [
+            'text' => 'CRM',
+            'icon' => 'fas fa-fw fa-address-book',
+            'submenu' => [
+                [
+                    'text' => 'Customers',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-user-friends',
+                ],
+                [
+                    'text' => 'Memberships',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-id-card',
+                ],
+                [
+                    'text' => 'Discounts',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-percent',
+                ],
+            ],
+        ],
+        [
+            'text' => 'Accounting',
+            'icon' => 'fas fa-fw fa-calculator',
+            'submenu' => [
+                [
+                    'text' => 'Chart of Accounts',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-book',
+                ],
+                [
+                    'text' => 'Ledgers',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-file-invoice',
+                ],
+                [
+                    'text' => 'Payment Vouchers',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-receipt',
+                ],
+                [
+                    'text' => 'VAT Management',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-file-invoice-dollar',
+                ],
+            ],
+        ],
+        [
+            'text' => 'Reports',
+            'icon' => 'fas fa-fw fa-chart-bar',
+            'submenu' => [
+                [
+                    'text' => 'Sales Report',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-chart-line',
+                ],
+                [
+                    'text' => 'Order Report',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-file-alt',
+                ],
+                [
+                    'text' => 'Inventory Report',
+                    'url' => '#',
+                    'icon' => 'fas fa-fw fa-clipboard',
+                ],
+            ],
+        ],
+        ['header' => 'SETTINGS'],
+        [
+            'text' => 'Company Settings',
             'url' => '#',
+            'icon' => 'fas fa-fw fa-building',
+        ],
+        [
+            'text' => 'Branch Management',
+            'url' => '#',
+            'icon' => 'fas fa-fw fa-sitemap',
+        ],
+        [
+            'text' => 'User Management',
+            'url' => '#',
+            'icon' => 'fas fa-fw fa-users-cog',
+        ],
+        [
+            'text' => 'Roles & Permissions',
+            'url' => '#',
+            'icon' => 'fas fa-fw fa-shield-alt',
         ],
     ],
 
@@ -430,7 +595,7 @@ return [
 
     'plugins' => [
         'Datatables' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -450,7 +615,7 @@ return [
             ],
         ],
         'Select2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -465,7 +630,7 @@ return [
             ],
         ],
         'Chartjs' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -475,7 +640,7 @@ return [
             ],
         ],
         'Sweetalert2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -548,3 +713,4 @@ return [
 
     'livewire' => false,
 ];
+

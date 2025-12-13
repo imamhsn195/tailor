@@ -8,6 +8,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Admin routes (require authentication and tenant context)
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'ensuretenantactive', 'ensuresubscriptionactive'])->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+});
+
 // Subscription routes (public)
 Route::prefix('subscriptions')->name('subscriptions.')->group(function () {
     Route::get('/', [SubscriptionController::class, 'index'])->name('index');
