@@ -109,6 +109,18 @@ return [
     'generate_barcode' => 'Generate Barcode',
     'generate_qr_code' => 'Generate QR Code',
     'abbreviation' => 'Abbreviation',
+    'stock_in' => 'Stock In',
+    'stock_out' => 'Stock Out',
+    'stock_transfer' => 'Stock Transfer',
+    'inventory_count' => 'Inventory Count',
+    'damage_stock' => 'Damage Stock',
+    'available_quantity' => 'Available Quantity',
+    'reserved_quantity' => 'Reserved Quantity',
+    'low_stock' => 'Low Stock',
+    'transfer_number' => 'Transfer Number',
+    'from_branch' => 'From Branch',
+    'to_branch' => 'To Branch',
+    'reason' => 'Reason',
     
     // Common messages
     'no_records_found' => 'No records found',

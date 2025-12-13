@@ -4,11 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class Inventory extends Model
+class DamageStock extends Model
 {
     use LogsActivity;
 
@@ -18,16 +17,17 @@ class Inventory extends Model
         'size',
         'color',
         'quantity',
-        'reserved_quantity',
+        'reason',
+        'status',
+        'user_id',
     ];
 
     protected $casts = [
         'quantity' => 'decimal:2',
-        'reserved_quantity' => 'decimal:2',
     ];
 
     /**
-     * Get the product for this inventory
+     * Get the product for this damage stock
      */
     public function product(): BelongsTo
     {
@@ -35,7 +35,7 @@ class Inventory extends Model
     }
 
     /**
-     * Get the branch for this inventory
+     * Get the branch for this damage stock
      */
     public function branch(): BelongsTo
     {
@@ -43,19 +43,11 @@ class Inventory extends Model
     }
 
     /**
-     * Get transactions for this inventory
+     * Get the user who recorded this damage
      */
-    public function transactions(): HasMany
+    public function user(): BelongsTo
     {
-        return $this->hasMany(InventoryTransaction::class);
-    }
-
-    /**
-     * Get available quantity (quantity - reserved)
-     */
-    public function getAvailableQuantityAttribute(): float
-    {
-        return max(0, $this->quantity - $this->reserved_quantity);
+        return $this->belongsTo(User::class);
     }
 
     /**
@@ -64,7 +56,7 @@ class Inventory extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['quantity', 'unit_price'])
+            ->logOnly(['quantity', 'status', 'reason'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }

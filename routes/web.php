@@ -48,6 +48,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
     Route::resource('product-categories', \App\Http\Controllers\Admin\ProductCategoryController::class);
     Route::resource('product-units', \App\Http\Controllers\Admin\ProductUnitController::class);
+    
+    // Inventory Management
+    Route::get('inventory/stock-in', [\App\Http\Controllers\Admin\InventoryController::class, 'stockIn'])->name('inventory.stock-in');
+    Route::post('inventory/stock-in', [\App\Http\Controllers\Admin\InventoryController::class, 'processStockIn'])->name('inventory.stock-in.process');
+    Route::get('inventory/stock-out', [\App\Http\Controllers\Admin\InventoryController::class, 'stockOut'])->name('inventory.stock-out');
+    Route::post('inventory/stock-out', [\App\Http\Controllers\Admin\InventoryController::class, 'processStockOut'])->name('inventory.stock-out.process');
+    Route::resource('inventory', \App\Http\Controllers\Admin\InventoryController::class)->only(['index', 'show']);
 });
 
 // Subscription routes (public)

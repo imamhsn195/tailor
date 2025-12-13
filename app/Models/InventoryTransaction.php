@@ -2,37 +2,31 @@
 
 namespace App\Models;
 
-use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class InventoryTransaction extends Model
 {
     use LogsActivity;
 
     protected $fillable = [
-        'inventory_id',
-        'branch_id',
         'product_id',
-        'transaction_type', // in, out, transfer, adjustment
-        'quantity',
-        'reference_type', // order, sale, purchase, etc.
+        'branch_id',
+        'type', // in, out, adjustment
+        'reference_type', // purchase, sale, transfer, etc.
         'reference_id',
+        'size',
+        'color',
+        'quantity',
         'notes',
-        'created_by',
+        'user_id',
     ];
 
     protected $casts = [
         'quantity' => 'decimal:2',
     ];
-
-    /**
-     * Get the inventory for this transaction
-     */
-    public function inventory(): BelongsTo
-    {
-        return $this->belongsTo(Inventory::class);
-    }
 
     /**
      * Get the branch for this transaction
@@ -53,9 +47,9 @@ class InventoryTransaction extends Model
     /**
      * Get the user who created this transaction
      */
-    public function creator(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class);
     }
 
     /**
