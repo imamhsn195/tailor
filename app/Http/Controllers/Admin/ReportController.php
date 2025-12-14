@@ -5,16 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\PosSale;
+use App\Models\Product;
 use App\Models\Inventory;
-use App\Models\FactoryProduction;
 use App\Models\Employee;
-use App\Models\SalaryPayment;
 use App\Models\ChartOfAccount;
 use App\Models\Ledger;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -22,381 +21,261 @@ class ReportController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:report.view')->only(['index', 'show', 'export']);
+        $this->middleware('permission:report.view')->only(['index', 'orders', 'sales', 'inventory', 'factory', 'hr', 'accounting']);
     }
 
     /**
-     * Display reports index
+     * Display the reports index page
      */
     public function index()
     {
-        $this->authorize('view', Order::class);
+        abort_unless(auth()->user()?->can('report.view'), 403);
 
         return view('admin.reports.index');
     }
 
     /**
-     * Order reports
+     * Display order reports
      */
     public function orders(Request $request)
     {
-        $this->authorize('view', Order::class);
+        abort_unless(auth()->user()?->can('report.view'), 403);
 
-        $query = Order::with(['customer', 'branch', 'items.product']);
+        $query = Order::with(['customer', 'branch']);
 
-        // Filters
-        if ($request->filled('customer_id')) {
-            $query->where('customer_id', $request->customer_id);
-        }
-
-        if ($request->filled('branch_id')) {
-            $query->where('branch_id', $request->branch_id);
-        }
-
+        // Filter by date range
         if ($request->filled('date_from')) {
             $query->where('order_date', '>=', $request->date_from);
         }
-
         if ($request->filled('date_to')) {
             $query->where('order_date', '<=', $request->date_to);
         }
 
+        // Filter by customer
+        if ($request->filled('customer_id')) {
+            $query->where('customer_id', $request->customer_id);
+        }
+
+        // Filter by branch
+        if ($request->filled('branch_id')) {
+            $query->where('branch_id', $request->branch_id);
+        }
+
+        // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        $orders = $query->latest('order_date')->get();
+        $orders = $query->latest('order_date')->paginate(20);
+        $branches = Branch::where('is_active', true)->get();
 
-        if ($request->has('export')) {
-            return $this->exportOrders($orders);
-        }
+        // Summary statistics
+        $summary = [
+            'total_orders' => $query->count(),
+            'total_amount' => $query->sum('total_amount'),
+            'pending' => (clone $query)->where('status', 'pending')->count(),
+            'completed' => (clone $query)->where('status', 'completed')->count(),
+        ];
 
-        return view('admin.reports.orders', compact('orders'));
+        return view('admin.reports.orders', compact('orders', 'branches', 'summary'));
     }
 
     /**
-     * Sales reports
+     * Display sales reports (POS Sales)
      */
     public function sales(Request $request)
     {
-        $this->authorize('view', PosSale::class);
+        abort_unless(auth()->user()?->can('report.view'), 403);
 
-        $query = PosSale::with(['customer', 'branch', 'items.product']);
+        $query = PosSale::with(['customer', 'branch']);
 
-        // Filters
+        // Filter by date range
+        if ($request->filled('date_from')) {
+            $query->where('sale_date', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->where('sale_date', '<=', $request->date_to);
+        }
+
+        // Filter by branch
         if ($request->filled('branch_id')) {
             $query->where('branch_id', $request->branch_id);
         }
 
-        if ($request->filled('date_from')) {
-            $query->whereDate('sale_date', '>=', $request->date_from);
+        // Filter by payment method
+        if ($request->filled('payment_method')) {
+            $query->where('payment_method', $request->payment_method);
         }
 
-        if ($request->filled('date_to')) {
-            $query->whereDate('sale_date', '<=', $request->date_to);
-        }
+        $sales = $query->latest('sale_date')->paginate(20);
+        $branches = Branch::where('is_active', true)->get();
 
-        $sales = $query->latest('sale_date')->get();
+        // Summary statistics
+        $summary = [
+            'total_sales' => $query->count(),
+            'total_amount' => $query->sum('total_amount'),
+            'total_vat' => $query->sum('vat_amount'),
+            'total_discount' => $query->sum('discount_amount'),
+            'cash_sales' => (clone $query)->where('payment_method', 'cash')->sum('total_amount'),
+        ];
 
-        if ($request->has('export')) {
-            return $this->exportSales($sales);
-        }
-
-        return view('admin.reports.sales', compact('sales'));
+        return view('admin.reports.sales', compact('sales', 'branches', 'summary'));
     }
 
     /**
-     * Inventory reports
+     * Display inventory reports
      */
     public function inventory(Request $request)
     {
-        $this->authorize('view', Inventory::class);
+        abort_unless(auth()->user()?->can('report.view'), 403);
 
         $query = Inventory::with(['product', 'branch']);
 
-        // Filters
+        // Filter by branch
         if ($request->filled('branch_id')) {
             $query->where('branch_id', $request->branch_id);
         }
 
+        // Filter by product
         if ($request->filled('product_id')) {
             $query->where('product_id', $request->product_id);
         }
 
+        // Filter low stock
         if ($request->filled('low_stock')) {
             $query->whereHas('product', function ($q) {
                 $q->whereColumn('inventories.quantity', '<=', 'products.low_stock_alert');
             });
         }
 
-        $inventories = $query->get();
+        $inventories = $query->latest()->paginate(20);
+        $branches = Branch::where('is_active', true)->get();
+        $products = Product::where('is_active', true)->get();
 
-        if ($request->has('export')) {
-            return $this->exportInventory($inventories);
-        }
+        // Summary statistics
+        $summary = [
+            'total_items' => $query->count(),
+            'total_quantity' => $query->sum('quantity'),
+            'total_value' => $query->join('products', 'inventories.product_id', '=', 'products.id')
+                ->sum(DB::raw('inventories.quantity * products.purchase_price')),
+            'low_stock_items' => $query->whereHas('product', function ($q) {
+                $q->whereColumn('inventories.quantity', '<=', 'products.low_stock_alert');
+            })->count(),
+        ];
 
-        return view('admin.reports.inventory', compact('inventories'));
+        return view('admin.reports.inventory', compact('inventories', 'branches', 'products', 'summary'));
     }
 
     /**
-     * Factory reports
+     * Display factory production reports
      */
     public function factory(Request $request)
     {
-        $this->authorize('view', FactoryProduction::class);
+        abort_unless(auth()->user()?->can('report.view'), 403);
 
-        $query = FactoryProduction::with(['product', 'order', 'steps.worker']);
+        // This will need to be implemented when Factory models are available
+        // For now, return a placeholder view
+        
+        $query = DB::table('factory_productions')
+            ->select('factory_productions.*')
+            ->when($request->filled('date_from'), function ($q) use ($request) {
+                $q->where('production_date', '>=', $request->date_from);
+            })
+            ->when($request->filled('date_to'), function ($q) use ($request) {
+                $q->where('production_date', '<=', $request->date_to);
+            });
 
-        // Filters
-        if ($request->filled('date_from')) {
-            $query->where('production_date', '>=', $request->date_from);
-        }
+        $productions = $query->latest('production_date')->paginate(20);
+        $branches = Branch::where('is_active', true)->get();
 
-        if ($request->filled('date_to')) {
-            $query->where('production_date', '<=', $request->date_to);
-        }
+        $summary = [
+            'total_productions' => $query->count(),
+        ];
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        $productions = $query->latest('production_date')->get();
-
-        if ($request->has('export')) {
-            return $this->exportFactory($productions);
-        }
-
-        return view('admin.reports.factory', compact('productions'));
+        return view('admin.reports.factory', compact('productions', 'branches', 'summary'));
     }
 
     /**
-     * HR reports
+     * Display HR reports
      */
     public function hr(Request $request)
     {
-        $this->authorize('view', Employee::class);
+        abort_unless(auth()->user()?->can('report.view'), 403);
 
-        $reportType = $request->get('type', 'attendance'); // attendance, salary, leave
+        $query = Employee::with(['department', 'designation', 'branch']);
 
-        if ($reportType === 'attendance') {
-            return $this->attendanceReport($request);
-        } elseif ($reportType === 'salary') {
-            return $this->salaryReport($request);
-        } elseif ($reportType === 'leave') {
-            return $this->leaveReport($request);
-        }
-
-        return view('admin.reports.hr');
-    }
-
-    /**
-     * Accounting reports
-     */
-    public function accounting(Request $request)
-    {
-        $this->authorize('view', ChartOfAccount::class);
-
-        $reportType = $request->get('type', 'ledger'); // ledger, trial_balance, profit_loss
-
-        if ($reportType === 'ledger') {
-            return $this->ledgerReport($request);
-        } elseif ($reportType === 'trial_balance') {
-            return $this->trialBalanceReport($request);
-        }
-
-        return view('admin.reports.accounting');
-    }
-
-    /**
-     * Export orders to Excel
-     */
-    protected function exportOrders($orders)
-    {
-        // This would use a dedicated Export class
-        // For now, return a simple response
-        return response()->json(['message' => 'Excel export functionality will be implemented']);
-    }
-
-    /**
-     * Export sales to Excel
-     */
-    protected function exportSales($sales)
-    {
-        return response()->json(['message' => 'Excel export functionality will be implemented']);
-    }
-
-    /**
-     * Export inventory to Excel
-     */
-    protected function exportInventory($inventories)
-    {
-        return response()->json(['message' => 'Excel export functionality will be implemented']);
-    }
-
-    /**
-     * Export factory to Excel
-     */
-    protected function exportFactory($productions)
-    {
-        return response()->json(['message' => 'Excel export functionality will be implemented']);
-    }
-
-    /**
-     * Attendance report
-     */
-    protected function attendanceReport(Request $request)
-    {
-        $query = \App\Models\Attendance::with(['employee', 'branch']);
-
-        if ($request->filled('employee_id')) {
-            $query->where('employee_id', $request->employee_id);
-        }
-
+        // Filter by branch
         if ($request->filled('branch_id')) {
             $query->where('branch_id', $request->branch_id);
         }
 
-        if ($request->filled('date_from')) {
-            $query->where('attendance_date', '>=', $request->date_from);
+        // Filter by department
+        if ($request->filled('department_id')) {
+            $query->where('department_id', $request->department_id);
         }
 
-        if ($request->filled('date_to')) {
-            $query->where('attendance_date', '<=', $request->date_to);
+        // Filter by designation
+        if ($request->filled('designation_id')) {
+            $query->where('designation_id', $request->designation_id);
         }
 
-        $attendances = $query->latest('attendance_date')->get();
+        $employees = $query->latest()->paginate(20);
+        $branches = Branch::where('is_active', true)->get();
 
-        if ($request->has('export')) {
-            return $this->exportAttendance($attendances);
-        }
+        // Summary statistics
+        $summary = [
+            'total_employees' => $query->count(),
+            'active_employees' => (clone $query)->where('is_active', true)->count(),
+            'total_salary' => DB::table('salaries')
+                ->join('employees', 'salaries.employee_id', '=', 'employees.id')
+                ->when($request->filled('branch_id'), function ($q) use ($request) {
+                    $q->where('employees.branch_id', $request->branch_id);
+                })
+                ->sum('salaries.gross_salary'),
+        ];
 
-        return view('admin.reports.attendance', compact('attendances'));
+        return view('admin.reports.hr', compact('employees', 'branches', 'summary'));
     }
 
     /**
-     * Salary report
+     * Display accounting reports
      */
-    protected function salaryReport(Request $request)
+    public function accounting(Request $request)
     {
-        $query = SalaryPayment::with(['employee']);
+        abort_unless(auth()->user()?->can('report.view'), 403);
 
-        if ($request->filled('employee_id')) {
-            $query->where('employee_id', $request->employee_id);
-        }
-
-        if ($request->filled('date_from')) {
-            $query->where('payment_date', '>=', $request->date_from);
-        }
-
-        if ($request->filled('date_to')) {
-            $query->where('payment_date', '<=', $request->date_to);
-        }
-
-        $payments = $query->latest('payment_date')->get();
-
-        if ($request->has('export')) {
-            return $this->exportSalary($payments);
-        }
-
-        return view('admin.reports.salary', compact('payments'));
-    }
-
-    /**
-     * Leave report
-     */
-    protected function leaveReport(Request $request)
-    {
-        $query = \App\Models\Leave::with(['employee']);
-
-        if ($request->filled('employee_id')) {
-            $query->where('employee_id', $request->employee_id);
-        }
-
-        if ($request->filled('date_from')) {
-            $query->where('leave_date', '>=', $request->date_from);
-        }
-
-        if ($request->filled('date_to')) {
-            $query->where('leave_date', '<=', $request->date_to);
-        }
-
-        $leaves = $query->latest('leave_date')->get();
-
-        if ($request->has('export')) {
-            return $this->exportLeave($leaves);
-        }
-
-        return view('admin.reports.leave', compact('leaves'));
-    }
-
-    /**
-     * Ledger report
-     */
-    protected function ledgerReport(Request $request)
-    {
         $query = Ledger::with(['account', 'branch']);
 
+        // Filter by account
         if ($request->filled('account_id')) {
             $query->where('account_id', $request->account_id);
         }
 
+        // Filter by date range
         if ($request->filled('date_from')) {
             $query->where('transaction_date', '>=', $request->date_from);
         }
-
         if ($request->filled('date_to')) {
             $query->where('transaction_date', '<=', $request->date_to);
         }
 
-        $ledgers = $query->latest('transaction_date')->get();
-
-        if ($request->has('export')) {
-            return $this->exportLedger($ledgers);
+        // Filter by branch
+        if ($request->filled('branch_id')) {
+            $query->where('branch_id', $request->branch_id);
         }
 
-        return view('admin.reports.ledger', compact('ledgers'));
+        $ledgers = $query->latest('transaction_date')->paginate(20);
+        $accounts = ChartOfAccount::where('is_active', true)->get();
+        $branches = Branch::where('is_active', true)->get();
+
+        // Summary statistics
+        $summary = [
+            'total_transactions' => $query->count(),
+            'total_debit' => $query->sum('debit'),
+            'total_credit' => $query->sum('credit'),
+            'balance' => $query->sum(DB::raw('debit - credit')),
+        ];
+
+        return view('admin.reports.accounting', compact('ledgers', 'accounts', 'branches', 'summary'));
     }
-
-    /**
-     * Trial balance report
-     */
-    protected function trialBalanceReport(Request $request)
-    {
-        $asOfDate = $request->get('as_of_date', now()->toDateString());
-
-        $accounts = ChartOfAccount::with(['ledgerEntries' => function ($query) use ($asOfDate) {
-            $query->where('transaction_date', '<=', $asOfDate);
-        }])->where('is_active', true)->get();
-
-        $trialBalance = $accounts->map(function ($account) {
-            $debit = $account->ledgerEntries->sum('debit');
-            $credit = $account->ledgerEntries->sum('credit');
-            $balance = $debit - $credit;
-
-            return [
-                'account_code' => $account->account_code,
-                'account_name' => $account->account_name,
-                'account_type' => $account->account_type,
-                'debit' => $debit,
-                'credit' => $credit,
-                'balance' => $balance,
-            ];
-        });
-
-        if ($request->has('export')) {
-            return $this->exportTrialBalance($trialBalance);
-        }
-
-        return view('admin.reports.trial-balance', compact('trialBalance', 'asOfDate'));
-    }
-
-    /**
-     * Export methods (placeholder - will be implemented with Excel exports)
-     */
-    protected function exportAttendance($attendances) { return response()->json(['message' => 'Export will be implemented']); }
-    protected function exportSalary($payments) { return response()->json(['message' => 'Export will be implemented']); }
-    protected function exportLeave($leaves) { return response()->json(['message' => 'Export will be implemented']); }
-    protected function exportLedger($ledgers) { return response()->json(['message' => 'Export will be implemented']); }
-    protected function exportTrialBalance($trialBalance) { return response()->json(['message' => 'Export will be implemented']); }
 }
-

@@ -7,126 +7,267 @@
 @stop
 
 @section('content')
+    <!-- Filters -->
+    <x-adminlte-card title="{{ trans_common('filters') }}" theme="info" icon="fas fa-filter">
+        <form method="GET" action="{{ route('admin.dashboard.index') }}" class="row">
+            <div class="col-md-3">
+                <label>{{ trans_common('branch') }}</label>
+                <select name="branch_id" class="form-control">
+                    <option value="">{{ trans_common('all') }} {{ trans_common('branches') }}</option>
+                    @foreach($branches as $branch)
+                        <option value="{{ $branch->id }}" {{ $branchId == $branch->id ? 'selected' : '' }}>
+                            {{ $branch->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label>{{ trans_common('date_from') }}</label>
+                <input type="date" name="date_from" class="form-control" value="{{ $dateFrom }}">
+            </div>
+            <div class="col-md-3">
+                <label>{{ trans_common('date_to') }}</label>
+                <input type="date" name="date_to" class="form-control" value="{{ $dateTo }}">
+            </div>
+            <div class="col-md-3">
+                <label>&nbsp;</label>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-search"></i> {{ trans_common('filter') }}
+                </button>
+            </div>
+        </form>
+    </x-adminlte-card>
+
+    <!-- Statistics Cards -->
     <div class="row">
-        <!-- Total Orders -->
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-                <div class="inner">
-                    <h3>{{ number_format($stats['total_orders']) }}</h3>
-                    <p>{{ trans_common('total_orders') }}</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-                <a href="#" class="small-box-footer">
-                    {{ trans_common('more_info') }} <i class="fas fa-arrow-circle-right"></i>
-                </a>
-            </div>
+            <x-adminlte-info-box title="{{ trans_common('total_collections') }}" 
+                                 text="{{ currency_format($totalCollections) }}" 
+                                 icon="fas fa-money-bill-wave" 
+                                 theme="success"/>
         </div>
-
-        <!-- Total Sales -->
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-success">
-                <div class="inner">
-                    <h3>{{ currency_format($stats['total_sales']) }}</h3>
-                    <p>{{ trans_common('total_sales') }}</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-                <a href="#" class="small-box-footer">
-                    {{ trans_common('more_info') }} <i class="fas fa-arrow-circle-right"></i>
-                </a>
-            </div>
+            <x-adminlte-info-box title="{{ trans_common('total_orders') }}" 
+                                 text="{{ number_format($totalOrders) }}" 
+                                 icon="fas fa-shopping-cart" 
+                                 theme="info"/>
         </div>
-
-        <!-- Total Customers -->
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-warning">
-                <div class="inner">
-                    <h3>{{ number_format($stats['total_customers']) }}</h3>
-                    <p>{{ trans_common('total_customers') }}</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <a href="#" class="small-box-footer">
-                    {{ trans_common('more_info') }} <i class="fas fa-arrow-circle-right"></i>
-                </a>
-            </div>
+            <x-adminlte-info-box title="{{ trans_common('total_sales') }}" 
+                                 text="{{ number_format($totalSales) }}" 
+                                 icon="fas fa-cash-register" 
+                                 theme="warning"/>
         </div>
-
-        <!-- Total Products -->
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-danger">
-                <div class="inner">
-                    <h3>{{ number_format($stats['total_products']) }}</h3>
-                    <p>{{ trans_common('total_products') }}</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-box"></i>
-                </div>
-                <a href="#" class="small-box-footer">
-                    {{ trans_common('more_info') }} <i class="fas fa-arrow-circle-right"></i>
-                </a>
-            </div>
+            <x-adminlte-info-box title="{{ trans_common('total_expenses') }}" 
+                                 text="{{ currency_format($totalExpenses) }}" 
+                                 icon="fas fa-credit-card" 
+                                 theme="danger"/>
         </div>
     </div>
 
     <div class="row">
-        <!-- Pending Orders -->
-        <div class="col-lg-6 col-12">
-            <div class="card">
-                <div class="card-header border-transparent">
-                    <h3 class="card-title">{{ trans_common('pending_orders') }}</h3>
-                    <div class="card-tools">
-                        <span class="badge badge-danger">{{ $stats['pending_orders'] }}</span>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table m-0">
-                            <thead>
-                                <tr>
-                                    <th>{{ trans_common('order_no') }}</th>
-                                    <th>{{ trans_common('customer') }}</th>
-                                    <th>{{ trans_common('delivery_date') }}</th>
-                                    <th>{{ trans_common('status') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="4" class="text-center">{{ trans_common('no_data_available') }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        <div class="col-lg-3 col-6">
+            <x-adminlte-info-box title="{{ trans_common('pending_orders') }}" 
+                                 text="{{ number_format($pendingOrders) }}" 
+                                 icon="fas fa-clock" 
+                                 theme="warning"/>
         </div>
-
-        <!-- Today's Sales -->
-        <div class="col-lg-6 col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">{{ trans_common('today_sales') }}</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12">
-                            <h2 class="text-center">{{ currency_format($stats['today_sales']) }}</h2>
-                            <p class="text-center text-muted">{{ trans_common('total_sales_today') }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="col-lg-3 col-6">
+            <x-adminlte-info-box title="{{ trans_common('customers') }}" 
+                                 text="{{ number_format($totalCustomers) }}" 
+                                 icon="fas fa-users" 
+                                 theme="primary"/>
+        </div>
+        <div class="col-lg-3 col-6">
+            <x-adminlte-info-box title="{{ trans_common('employees') }}" 
+                                 text="{{ number_format($totalEmployees) }}" 
+                                 icon="fas fa-user-tie" 
+                                 theme="info"/>
+        </div>
+        <div class="col-lg-3 col-6">
+            <x-adminlte-info-box title="{{ trans_common('active_productions') }}" 
+                                 text="{{ number_format($activeProductions) }}" 
+                                 icon="fas fa-industry" 
+                                 theme="success"/>
         </div>
     </div>
-@stop
 
-@section('css')
-@stop
+    <!-- Branch-wise Collections -->
+    <x-adminlte-card title="{{ trans_common('branch_wise_collections') }}" theme="primary" icon="fas fa-chart-bar">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>{{ trans_common('branch') }}</th>
+                        <th>{{ trans_common('order_collection') }}</th>
+                        <th>{{ trans_common('pos_collection') }}</th>
+                        <th>{{ trans_common('total_collection') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($branchCollections as $collection)
+                        <tr>
+                            <td>{{ $collection->name }}</td>
+                            <td>{{ currency_format($collection->order_collection) }}</td>
+                            <td>{{ currency_format($collection->pos_collection) }}</td>
+                            <td><strong>{{ currency_format($collection->total_collection) }}</strong></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center">{{ trans_common('no_records_found') }}</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </x-adminlte-card>
 
-@section('js')
-@stop
+    <!-- Branch-wise Orders -->
+    <x-adminlte-card title="{{ trans_common('branch_wise_orders') }}" theme="info" icon="fas fa-shopping-bag">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>{{ trans_common('branch') }}</th>
+                        <th>{{ trans_common('order_count') }}</th>
+                        <th>{{ trans_common('total_amount') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($branchOrders as $order)
+                        <tr>
+                            <td>{{ $order->name }}</td>
+                            <td>{{ number_format($order->order_count) }}</td>
+                            <td>{{ currency_format($order->order_amount) }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="text-center">{{ trans_common('no_records_found') }}</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </x-adminlte-card>
 
+    <!-- Branch-wise Expenses -->
+    <x-adminlte-card title="{{ trans_common('branch_wise_expenses') }}" theme="danger" icon="fas fa-chart-line">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>{{ trans_common('branch') }}</th>
+                        <th>{{ trans_common('total_expense') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($branchExpenses as $expense)
+                        <tr>
+                            <td>{{ $expense->name }}</td>
+                            <td>{{ currency_format($expense->total_expense) }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="text-center">{{ trans_common('no_records_found') }}</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </x-adminlte-card>
+
+    <div class="row">
+        <!-- Recent Orders -->
+        <div class="col-md-6">
+            <x-adminlte-card title="{{ trans_common('recent_orders') }}" theme="primary" icon="fas fa-list">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>{{ trans_common('order_number') }}</th>
+                                <th>{{ trans_common('customer') }}</th>
+                                <th>{{ trans_common('amount') }}</th>
+                                <th>{{ trans_common('date') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentOrders as $order)
+                                <tr>
+                                    <td>{{ $order->order_number }}</td>
+                                    <td>{{ $order->customer->name ?? '-' }}</td>
+                                    <td>{{ currency_format($order->net_payable) }}</td>
+                                    <td>{{ $order->order_date->format('Y-m-d') }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center">{{ trans_common('no_records_found') }}</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </x-adminlte-card>
+        </div>
+
+        <!-- Recent Sales -->
+        <div class="col-md-6">
+            <x-adminlte-card title="{{ trans_common('recent_sales') }}" theme="success" icon="fas fa-cash-register">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>{{ trans_common('invoice_number') }}</th>
+                                <th>{{ trans_common('customer') }}</th>
+                                <th>{{ trans_common('amount') }}</th>
+                                <th>{{ trans_common('date') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentSales as $sale)
+                                <tr>
+                                    <td>{{ $sale->invoice_number }}</td>
+                                    <td>{{ $sale->customer_name ?? ($sale->customer->name ?? '-') }}</td>
+                                    <td>{{ currency_format($sale->total_amount) }}</td>
+                                    <td>{{ $sale->sale_date->format('Y-m-d') }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center">{{ trans_common('no_records_found') }}</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </x-adminlte-card>
+        </div>
+    </div>
+
+    <!-- Low Stock Alert -->
+    @if($lowStockProducts->count() > 0)
+        <x-adminlte-card title="{{ trans_common('low_stock_alert') }}" theme="warning" icon="fas fa-exclamation-triangle">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>{{ trans_common('product') }}</th>
+                            <th>{{ trans_common('branch') }}</th>
+                            <th>{{ trans_common('quantity') }}</th>
+                            <th>{{ trans_common('low_stock_alert') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($lowStockProducts as $item)
+                            <tr>
+                                <td>{{ $item->product->name }}</td>
+                                <td>{{ $item->branch->name }}</td>
+                                <td>{{ number_format($item->quantity, 2) }}</td>
+                                <td>{{ number_format($item->product->low_stock_alert) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </x-adminlte-card>
+    @endif
+@stop
