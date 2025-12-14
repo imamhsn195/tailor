@@ -115,11 +115,37 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     Route::resource('rent-deliveries', \App\Http\Controllers\Admin\RentDeliveryController::class);
     Route::resource('rent-returns', \App\Http\Controllers\Admin\RentReturnController::class);
     
+    // Delivery Management
+    Route::resource('deliveries', \App\Http\Controllers\Admin\DeliveryController::class);
+    
     // Settings
     Route::get('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::put('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
     Route::resource('blocked-ips', \App\Http\Controllers\Admin\BlockedIpController::class);
     Route::resource('blocked-macs', \App\Http\Controllers\Admin\BlockedMacController::class);
+});
+
+// Super Admin routes (require super admin access)
+Route::prefix('super-admin')->name('super-admin.')->middleware(['auth', \App\Http\Middleware\EnsureSuperAdmin::class])->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\SuperAdmin\SystemHealthController::class, 'index'])->name('dashboard');
+    
+    // Tenant Management
+    Route::post('tenants/{tenant}/suspend', [\App\Http\Controllers\SuperAdmin\TenantController::class, 'suspend'])->name('tenants.suspend');
+    Route::post('tenants/{tenant}/activate', [\App\Http\Controllers\SuperAdmin\TenantController::class, 'activate'])->name('tenants.activate');
+    Route::resource('tenants', \App\Http\Controllers\SuperAdmin\TenantController::class);
+    
+    // Subscription Management
+    Route::post('subscriptions/{subscription}/cancel', [\App\Http\Controllers\SuperAdmin\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+    Route::post('subscriptions/{subscription}/reactivate', [\App\Http\Controllers\SuperAdmin\SubscriptionController::class, 'reactivate'])->name('subscriptions.reactivate');
+    Route::resource('subscriptions', \App\Http\Controllers\SuperAdmin\SubscriptionController::class)->only(['index', 'show']);
+    
+    // System Health
+    Route::get('system-health', [\App\Http\Controllers\SuperAdmin\SystemHealthController::class, 'index'])->name('system-health');
+    
+    // Tenant Domain Management
+    Route::resource('tenants.domains', \App\Http\Controllers\SuperAdmin\TenantDomainController::class)->except(['show', 'edit', 'update']);
+    Route::post('tenants/{tenant}/domains/{domain}/set-primary', [\App\Http\Controllers\SuperAdmin\TenantDomainController::class, 'setPrimary'])->name('tenant-domains.set-primary');
+    Route::post('tenants/{tenant}/domains/{domain}/verify', [\App\Http\Controllers\SuperAdmin\TenantDomainController::class, 'verify'])->name('tenant-domains.verify');
 });
 
 // Subscription routes (public)

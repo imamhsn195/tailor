@@ -8,6 +8,10 @@ use App\Models\Customer;
 use App\Models\Branch;
 use App\Models\Product;
 use App\Models\MeasurementTemplate;
+use App\Services\SMSService;
+use App\Jobs\SendSMS;
+use App\Jobs\SendEmail;
+use App\Mail\OrderCreatedMail;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
@@ -183,6 +187,9 @@ class OrderController extends Controller
 
             DB::commit();
 
+            // Send order created notification
+            $this->sendOrderCreatedNotification($order);
+
             return redirect()->route('admin.orders.show', $order)
                 ->with('success', trans_common('created_successfully'));
         } catch (\Exception $e) {
@@ -312,6 +319,45 @@ class OrderController extends Controller
         } while (Order::where('order_number', $orderNumber)->exists());
 
         return $orderNumber;
+    }
+
+    /**
+     * Send order created notification (SMS and Email)
+     */
+    protected function sendOrderCreatedNotification(Order $order): void
+    {
+        $order->load(['customer', 'branch']);
+        $customer = $order->customer;
+
+        if (!$customer) {
+            return;
+        }
+
+        // Send SMS
+        if ($customer->mobile) {
+            $smsMessage = str_replace(
+                ['{customer_name}', '{order_number}', '{total_amount}', '{delivery_date}'],
+                [
+                    $customer->name,
+                    $order->order_number,
+                    currency_format($order->net_payable),
+                    $order->delivery_date->format('Y-m-d'),
+                ],
+                config('sms.templates.order_created', 'Order #{order_number} created. Total: {total_amount}. Delivery: {delivery_date}.')
+            );
+
+            SendSMS::dispatch($customer->mobile, $smsMessage);
+        }
+
+        // Send Email
+        if ($customer->email) {
+            SendEmail::dispatch(
+                $customer->email,
+                'Order Created - ' . $order->order_number,
+                'emails.orders.created',
+                ['order' => $order, 'customer' => $customer, 'branch' => $order->branch]
+            );
+        }
     }
 }
 

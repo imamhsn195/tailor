@@ -13,26 +13,23 @@ class TenantFinder extends BaseTenantFinder
     {
         $host = $request->getHost();
         
-        // Extract subdomain from host (e.g., tenant1.example.com -> tenant1)
-        $subdomain = $this->extractSubdomain($host);
-        
-        if (!$subdomain) {
-            return null;
-        }
-        
-        // Find tenant by domain (subdomain)
-        $tenant = Tenant::where('domain', $subdomain)
-            ->where('status', 'active')
-            ->first();
-        
-        // Also check custom domains
-        if (!$tenant) {
-            $tenant = Tenant::whereHas('domains', function ($query) use ($host) {
+        // First, check custom domains (verified custom domains take priority)
+        $tenant = Tenant::whereHas('domains', function ($query) use ($host) {
                 $query->where('domain', $host)
                     ->where('is_verified', true);
             })
             ->where('status', 'active')
             ->first();
+        
+        // If no custom domain found, try subdomain
+        if (!$tenant) {
+            $subdomain = $this->extractSubdomain($host);
+            
+            if ($subdomain) {
+                $tenant = Tenant::where('domain', $subdomain)
+                    ->where('status', 'active')
+                    ->first();
+            }
         }
         
         return $tenant;
