@@ -58,6 +58,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     
     // Order Management
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
+    
+    // POS System
+    Route::get('pos', [\App\Http\Controllers\Admin\PosSaleController::class, 'create'])->name('pos.create');
+    Route::post('pos', [\App\Http\Controllers\Admin\PosSaleController::class, 'store'])->name('pos.store');
+    Route::resource('pos-sales', \App\Http\Controllers\Admin\PosSaleController::class)->only(['index', 'show']);
+    Route::resource('pos-exchanges', \App\Http\Controllers\Admin\PosExchangeController::class);
+    Route::resource('pos-cancellations', \App\Http\Controllers\Admin\PosCancellationController::class);
 });
 
 // Subscription routes (public)

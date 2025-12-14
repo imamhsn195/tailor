@@ -2,44 +2,41 @@
 
 namespace App\Models;
 
-use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class PosSale extends Model
 {
     use SoftDeletes, LogsActivity;
 
     protected $fillable = [
-        'sale_number',
+        'invoice_number',
         'customer_id',
         'branch_id',
-        'seller_id',
-        'sale_date',
+        'customer_name',
+        'customer_mobile',
         'subtotal',
         'discount_amount',
-        'discount_percentage',
         'vat_amount',
         'total_amount',
-        'paid_amount',
-        'change_amount',
         'payment_method',
-        'payment_reference',
-        'status',
-        'notes',
+        'sender_mobile',
+        'account_number',
+        'card_last_4',
+        'seller_id',
+        'sale_date',
     ];
 
     protected $casts = [
-        'sale_date' => 'datetime',
+        'sale_date' => 'date',
         'subtotal' => 'decimal:2',
         'discount_amount' => 'decimal:2',
-        'discount_percentage' => 'decimal:2',
         'vat_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
-        'paid_amount' => 'decimal:2',
-        'change_amount' => 'decimal:2',
     ];
 
     /**
@@ -75,12 +72,20 @@ class PosSale extends Model
     }
 
     /**
+     * Get sale number (alias for invoice_number)
+     */
+    public function getSaleNumberAttribute(): string
+    {
+        return $this->invoice_number;
+    }
+
+    /**
      * Configure activity log options
      */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['sale_number', 'total_amount', 'paid_amount', 'status'])
+            ->logOnly(['invoice_number', 'total_amount', 'payment_method'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
