@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('branch_id')->constrained('branches')->onDelete('restrict');
             $table->date('rent_date');
             $table->date('expected_return_date');
+            $table->date('actual_return_date')->nullable();
             $table->decimal('rent_amount', 10, 2)->default(0);
             $table->decimal('security_deposit', 10, 2)->default(0);
             $table->string('status')->default('active'); // active, returned, overdue

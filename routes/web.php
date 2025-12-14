@@ -110,6 +110,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     Route::resource('purchases', \App\Http\Controllers\Admin\PurchaseController::class);
     Route::resource('supplier-payments', \App\Http\Controllers\Admin\SupplierPaymentController::class);
     
+    // Sherwani Rent Management
+    Route::resource('rent-orders', \App\Http\Controllers\Admin\RentOrderController::class);
+    Route::resource('rent-deliveries', \App\Http\Controllers\Admin\RentDeliveryController::class);
+    Route::resource('rent-returns', \App\Http\Controllers\Admin\RentReturnController::class);
+    
     // Settings
     Route::get('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::put('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');

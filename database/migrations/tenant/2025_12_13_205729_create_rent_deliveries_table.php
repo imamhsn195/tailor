@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('rent_deliveries', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('rent_order_id')->constrained('rent_orders')->onDelete('cascade');
+            $table->date('delivery_date');
+            $table->string('delivery_status')->default('delivered'); // delivered, partial
+            $table->text('notes')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
     }

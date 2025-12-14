@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rent_returns', function (Blueprint $table) {
+        Schema::create('rent_order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('rent_order_id')->constrained('rent_orders')->onDelete('cascade');
-            $table->date('return_date');
-            $table->string('return_status')->default('complete'); // complete, partial, damaged
-            $table->decimal('damage_charges', 10, 2)->default(0);
-            $table->decimal('late_fees', 10, 2)->default(0);
-            $table->decimal('refund_amount', 10, 2)->default(0);
+            $table->foreignId('product_id')->nullable()->constrained('products')->onDelete('set null');
+            $table->foreignId('inventory_id')->nullable()->constrained('inventories')->onDelete('set null');
+            $table->string('barcode')->nullable();
+            $table->string('product_name');
+            $table->string('size')->nullable();
+            $table->decimal('rent_price', 10, 2)->default(0);
             $table->text('notes')->nullable();
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
     }
@@ -30,6 +30,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rent_returns');
+        Schema::dropIfExists('rent_order_items');
     }
 };
+
