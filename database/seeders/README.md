@@ -97,10 +97,10 @@ Creates default chart of accounts:
 
 ### Tenant Setup
 1. Create tenant (via subscription or admin panel)
-2. Tenant database is automatically created
-3. Run tenant seeders: `php artisan tenants:seed --tenant={tenant_id}`
+2. Tenant database is automatically created and seeded via `TenantProvisioningService`
+3. To re-seed or seed manually: `php artisan tenants:seed {tenant_id}`
 
-Or update `TenantProvisioningService` to automatically call `TenantDatabaseSeeder` when creating a tenant.
+Note: `TenantProvisioningService` automatically calls `TenantDatabaseSeeder` when creating a tenant.
 
 ## Notes
 
