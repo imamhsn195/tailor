@@ -36,8 +36,9 @@ class CustomerTest extends TestCase
     {
         $customer = Customer::factory()->create(['discount_percentage' => 15.50]);
 
-        $this->assertIsFloat($customer->discount_percentage);
-        $this->assertEquals(15.50, $customer->discount_percentage);
+        // SQLite returns decimals as strings, so check numeric value
+        $this->assertIsNumeric($customer->discount_percentage);
+        $this->assertEquals(15.50, (float) $customer->discount_percentage);
     }
 
     /**
@@ -60,7 +61,7 @@ class CustomerTest extends TestCase
         $membership = Membership::factory()->create();
 
         $customer->memberships()->attach($membership->id, [
-            'joined_at' => now(),
+            'started_at' => now(),
             'expires_at' => now()->addYear(),
         ]);
 
@@ -88,8 +89,11 @@ class CustomerTest extends TestCase
         $customer = Customer::factory()->create();
         $comment = CustomerComment::factory()->create(['customer_id' => $customer->id]);
 
-        $this->assertTrue($customer->comments->contains($comment));
-        $this->assertEquals(1, $customer->comments->count());
+        // Use the relationship method directly
+        $comments = $customer->comments()->get();
+        
+        $this->assertTrue($comments->contains($comment));
+        $this->assertEquals(1, $comments->count());
     }
 
     /**

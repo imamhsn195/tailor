@@ -21,23 +21,23 @@ class ProductFactory extends Factory
     {
         return [
             'name' => fake()->words(3, true),
-            'barcode' => fake()->optional()->unique()->ean13(),
-            'qr_code' => fake()->optional()->unique()->uuid(),
+            'barcode' => fake()->unique()->ean13(),
+            'qr_code' => fake()->unique()->uuid(),
             'category_id' => ProductCategory::factory(),
             'unit_id' => ProductUnit::factory(),
-            'brand' => fake()->optional()->company(),
+            'brand' => fake()->optional(0.7)->company(),
             'purchase_price' => fake()->randomFloat(2, 10, 1000),
             'sale_price' => fake()->randomFloat(2, 20, 1500),
-            'fabric_width' => fake()->optional()->randomFloat(2, 30, 60),
+            'fabric_width' => fake()->optional(0.5)->randomFloat(2, 30, 60),
             'vat_percentage' => fake()->randomFloat(2, 0, 20),
             'vat_type' => fake()->randomElement(['inclusive', 'exclusive']),
             'low_stock_alert' => fake()->numberBetween(0, 100),
-            'description' => fake()->optional()->paragraph(),
-            'images' => fake()->optional()->randomElements([
+            'description' => fake()->optional(0.5)->paragraph(),
+            'images' => fake()->optional(0.5)->randomElements([
                 'image1.jpg',
                 'image2.jpg',
                 'image3.jpg'
-            ], fake()->numberBetween(0, 3)),
+            ], fake()->numberBetween(1, 3)),
             'is_active' => true,
         ];
     }

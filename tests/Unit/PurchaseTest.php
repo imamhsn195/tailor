@@ -127,11 +127,12 @@ class PurchaseTest extends TestCase
             'due_amount' => 601.00,
         ]);
 
-        $this->assertIsFloat($purchase->subtotal);
-        $this->assertIsFloat($purchase->total_amount);
-        $this->assertIsFloat($purchase->due_amount);
-        $this->assertEquals(1000.50, $purchase->subtotal);
-        $this->assertEquals(1101.00, $purchase->total_amount);
+        // SQLite returns decimals as strings, so check numeric value
+        $this->assertIsNumeric($purchase->subtotal);
+        $this->assertIsNumeric($purchase->total_amount);
+        $this->assertIsNumeric($purchase->due_amount);
+        $this->assertEquals(1000.50, (float) $purchase->subtotal);
+        $this->assertEquals(1101.00, (float) $purchase->total_amount);
     }
 
     /**

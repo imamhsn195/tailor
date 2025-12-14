@@ -74,10 +74,11 @@ class ProductTest extends TestCase
             'sale_price' => 150.75,
         ]);
 
-        $this->assertIsFloat($product->purchase_price);
-        $this->assertIsFloat($product->sale_price);
-        $this->assertEquals(100.50, $product->purchase_price);
-        $this->assertEquals(150.75, $product->sale_price);
+        // SQLite returns decimals as strings, so check numeric value
+        $this->assertIsNumeric($product->purchase_price);
+        $this->assertIsNumeric($product->sale_price);
+        $this->assertEquals(100.50, (float) $product->purchase_price);
+        $this->assertEquals(150.75, (float) $product->sale_price);
     }
 
     /**

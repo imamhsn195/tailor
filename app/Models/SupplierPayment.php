@@ -14,6 +14,7 @@ class SupplierPayment extends Model
 
     protected $fillable = [
         'supplier_id',
+        'payment_number',
         'payment_date',
         'amount',
         'payment_method', // cash, cheque, bank_transfer

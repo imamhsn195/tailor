@@ -24,7 +24,7 @@ class OrderFactory extends Factory
             'branch_id' => Branch::factory(),
             'customer_id' => Customer::factory(),
             'order_date' => fake()->date(),
-            'delivery_date' => fake()->optional()->date(),
+            'delivery_date' => fake()->date(),
             'status' => fake()->randomElement(['pending', 'in_progress', 'completed', 'cancelled']),
             'total_amount' => fake()->randomFloat(2, 100, 10000),
             'net_payable' => fake()->randomFloat(2, 100, 10000),

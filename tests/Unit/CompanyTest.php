@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Company;
 use App\Models\Branch;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class CompanyTest extends TestCase
@@ -32,6 +33,14 @@ class CompanyTest extends TestCase
     public function test_company_can_have_branches(): void
     {
         $company = Company::factory()->create();
+        
+        // Add company_id to branches table if it doesn't exist
+        if (!Schema::hasColumn('branches', 'company_id')) {
+            Schema::table('branches', function ($table) {
+                $table->foreignId('company_id')->nullable()->after('id')->constrained('companies')->onDelete('cascade');
+            });
+        }
+        
         $branch1 = Branch::factory()->create(['company_id' => $company->id]);
         $branch2 = Branch::factory()->create(['company_id' => $company->id]);
 

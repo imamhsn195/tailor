@@ -19,7 +19,7 @@ class ProductUnitFactory extends Factory
     {
         return [
             'name' => fake()->randomElement(['Piece', 'Meter', 'Yard', 'Kg', 'Gram', 'Liter']),
-            'abbreviation' => fake()->optional()->randomElement(['pc', 'm', 'yd', 'kg', 'g', 'l']),
+            'abbreviation' => fake()->randomElement(['pc', 'm', 'yd', 'kg', 'g', 'l']),
             'is_active' => true,
         ];
     }

@@ -37,7 +37,7 @@ class Customer extends Model
     public function memberships(): BelongsToMany
     {
         return $this->belongsToMany(Membership::class, 'customer_memberships')
-            ->withPivot('joined_at', 'expires_at')
+            ->withPivot('started_at', 'expires_at')
             ->withTimestamps();
     }
 
