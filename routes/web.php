@@ -69,6 +69,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     // Factory Management
     Route::resource('worker-categories', \App\Http\Controllers\Admin\WorkerCategoryController::class);
     Route::resource('workers', \App\Http\Controllers\Admin\WorkerController::class);
+    
+    // HR & Payroll
+    Route::resource('departments', \App\Http\Controllers\Admin\DepartmentController::class);
+    Route::resource('designations', \App\Http\Controllers\Admin\DesignationController::class);
+    Route::resource('employees', \App\Http\Controllers\Admin\EmployeeController::class);
+    Route::resource('attendances', \App\Http\Controllers\Admin\AttendanceController::class);
+    Route::resource('leaves', \App\Http\Controllers\Admin\LeaveController::class);
+    Route::resource('employee-advances', \App\Http\Controllers\Admin\EmployeeAdvanceController::class);
+    Route::resource('employee-deductions', \App\Http\Controllers\Admin\EmployeeDeductionController::class);
+    Route::resource('salary-payments', \App\Http\Controllers\Admin\SalaryPaymentController::class);
 });
 
 // Subscription routes (public)
