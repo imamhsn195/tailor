@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\LogsActivity;
+use App\Casts\SafeEnumCast;
+use App\Enums\MembershipType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Membership extends Model
 {
@@ -13,7 +16,6 @@ class Membership extends Model
 
     protected $fillable = [
         'name',
-        'code',
         'type', // general, company
         'discount_percentage',
         'description',
@@ -21,6 +23,7 @@ class Membership extends Model
     ];
 
     protected $casts = [
+        'type' => SafeEnumCast::class . ':' . MembershipType::class,
         'discount_percentage' => 'decimal:2',
         'is_active' => 'boolean',
     ];
@@ -41,7 +44,7 @@ class Membership extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'code', 'type', 'discount_percentage', 'is_active'])
+            ->logOnly(['name', 'type', 'discount_percentage', 'is_active'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }

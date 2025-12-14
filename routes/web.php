@@ -79,6 +79,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     Route::resource('employee-advances', \App\Http\Controllers\Admin\EmployeeAdvanceController::class);
     Route::resource('employee-deductions', \App\Http\Controllers\Admin\EmployeeDeductionController::class);
     Route::resource('salary-payments', \App\Http\Controllers\Admin\SalaryPaymentController::class);
+    
+    // CRM
+    Route::resource('customers', \App\Http\Controllers\Admin\CustomerController::class);
+    Route::post('customers/{customer}/comments', [\App\Http\Controllers\Admin\CustomerController::class, 'addComment'])->name('customers.comments.store');
+    Route::resource('memberships', \App\Http\Controllers\Admin\MembershipController::class);
+    Route::resource('discounts', \App\Http\Controllers\Admin\DiscountController::class);
+    Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class);
+    Route::resource('gift-vouchers', \App\Http\Controllers\Admin\GiftVoucherController::class);
+    
+    // Accounting
+    Route::resource('chart-of-accounts', \App\Http\Controllers\Admin\ChartOfAccountController::class);
+    Route::resource('ledgers', \App\Http\Controllers\Admin\LedgerController::class);
+    Route::resource('payment-vouchers', \App\Http\Controllers\Admin\PaymentVoucherController::class);
+    Route::resource('vat-returns', \App\Http\Controllers\Admin\VatReturnController::class);
+    Route::resource('expenses', \App\Http\Controllers\Admin\ExpenseController::class);
 });
 
 // Subscription routes (public)

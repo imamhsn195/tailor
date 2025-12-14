@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Customer extends Model
 {
@@ -20,7 +21,7 @@ class Customer extends Model
         'email',
         'address',
         'discount_percentage',
-        'notes',
+        'comments',
         'is_active',
     ];
 
@@ -53,6 +54,14 @@ class Customer extends Model
     public function posSales(): HasMany
     {
         return $this->hasMany(PosSale::class);
+    }
+
+    /**
+     * Get comments for this customer
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(CustomerComment::class);
     }
 
     /**

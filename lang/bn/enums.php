@@ -49,5 +49,30 @@ return [
         'suspended' => 'স্থগিত',
         'terminated' => 'সমাপ্ত',
     ],
+    
+    // Membership Type
+    'membership_type' => [
+        'general' => 'সাধারণ',
+        'company' => 'কোম্পানি',
+    ],
+    
+    // Coupon Type
+    'coupon_type' => [
+        'percentage' => 'শতাংশ',
+        'fixed' => 'নির্দিষ্ট',
+    ],
+    
+    // Discount Type
+    'discount_type' => [
+        'percentage' => 'শতাংশ',
+        'fixed' => 'নির্দিষ্ট',
+    ],
+    
+    // Gift Voucher Status
+    'gift_voucher_status' => [
+        'active' => 'সক্রিয়',
+        'used' => 'ব্যবহৃত',
+        'expired' => 'মেয়াদ শেষ',
+    ],
 ];
 

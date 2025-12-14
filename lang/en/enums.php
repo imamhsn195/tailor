@@ -49,5 +49,30 @@ return [
         'suspended' => 'Suspended',
         'terminated' => 'Terminated',
     ],
+    
+    // Membership Type
+    'membership_type' => [
+        'general' => 'General',
+        'company' => 'Company',
+    ],
+    
+    // Coupon Type
+    'coupon_type' => [
+        'percentage' => 'Percentage',
+        'fixed' => 'Fixed',
+    ],
+    
+    // Discount Type
+    'discount_type' => [
+        'percentage' => 'Percentage',
+        'fixed' => 'Fixed',
+    ],
+    
+    // Gift Voucher Status
+    'gift_voucher_status' => [
+        'active' => 'Active',
+        'used' => 'Used',
+        'expired' => 'Expired',
+    ],
 ];
 

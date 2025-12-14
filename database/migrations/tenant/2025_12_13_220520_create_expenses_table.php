@@ -11,19 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_vouchers', function (Blueprint $table) {
+        Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->string('voucher_number')->unique();
-            $table->date('voucher_date');
+            $table->string('expense_number')->unique();
+            $table->date('expense_date');
             $table->foreignId('account_id')->constrained('chart_of_accounts')->onDelete('restrict');
-            $table->string('payee_name');
+            $table->foreignId('branch_id')->constrained('branches')->onDelete('restrict');
+            $table->string('expense_type')->default('petty_cash'); // petty_cash, utility, rent, salary, other
             $table->text('description');
             $table->decimal('amount', 15, 2);
             $table->string('payment_method')->default('cash'); // cash, cheque, bank_transfer
-            $table->string('cheque_number')->nullable();
-            $table->string('bank_name')->nullable();
-            $table->string('reference')->nullable();
-            $table->foreignId('branch_id')->nullable()->constrained('branches')->onDelete('set null');
+            $table->string('receipt_number')->nullable();
+            $table->text('notes')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
             $table->softDeletes();
@@ -35,6 +34,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payment_vouchers');
+        Schema::dropIfExists('expenses');
     }
 };
+

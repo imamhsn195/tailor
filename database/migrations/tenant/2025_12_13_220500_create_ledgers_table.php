@@ -11,22 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_vouchers', function (Blueprint $table) {
+        Schema::create('ledgers', function (Blueprint $table) {
             $table->id();
-            $table->string('voucher_number')->unique();
-            $table->date('voucher_date');
             $table->foreignId('account_id')->constrained('chart_of_accounts')->onDelete('restrict');
-            $table->string('payee_name');
+            $table->date('transaction_date');
+            $table->string('reference_type')->nullable(); // payment_voucher, order, pos_sale, purchase, etc.
+            $table->unsignedBigInteger('reference_id')->nullable();
             $table->text('description');
-            $table->decimal('amount', 15, 2);
-            $table->string('payment_method')->default('cash'); // cash, cheque, bank_transfer
-            $table->string('cheque_number')->nullable();
-            $table->string('bank_name')->nullable();
-            $table->string('reference')->nullable();
+            $table->decimal('debit', 15, 2)->default(0);
+            $table->decimal('credit', 15, 2)->default(0);
+            $table->decimal('balance', 15, 2)->default(0);
             $table->foreignId('branch_id')->nullable()->constrained('branches')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
-            $table->softDeletes();
+            
+            $table->index(['account_id', 'transaction_date']);
+            $table->index(['reference_type', 'reference_id']);
         });
     }
 
@@ -35,6 +35,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payment_vouchers');
+        Schema::dropIfExists('ledgers');
     }
 };
+
