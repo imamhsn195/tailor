@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('home_mobile_3')->nullable();
             $table->string('reference_1')->nullable();
             $table->string('reference_2')->nullable();
+            $table->foreignId('category_id')->nullable()->constrained('worker_categories')->onDelete('set null');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();

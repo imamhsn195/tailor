@@ -65,6 +65,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     Route::resource('pos-sales', \App\Http\Controllers\Admin\PosSaleController::class)->only(['index', 'show']);
     Route::resource('pos-exchanges', \App\Http\Controllers\Admin\PosExchangeController::class);
     Route::resource('pos-cancellations', \App\Http\Controllers\Admin\PosCancellationController::class);
+    
+    // Factory Management
+    Route::resource('worker-categories', \App\Http\Controllers\Admin\WorkerCategoryController::class);
+    Route::resource('workers', \App\Http\Controllers\Admin\WorkerController::class);
 });
 
 // Subscription routes (public)
