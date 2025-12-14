@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\SafeEnumCast;
 use App\Enums\MembershipType;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,7 @@ use Spatie\Activitylog\LogOptions;
 
 class Membership extends Model
 {
-    use SoftDeletes, LogsActivity;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'name',

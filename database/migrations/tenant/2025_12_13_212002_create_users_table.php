@@ -11,17 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        if (!Schema::hasTable('users')) {
+            Schema::create('users', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('email')->unique();
+                $table->timestamp('email_verified_at')->nullable();
+                $table->string('password');
+                $table->rememberToken();
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        } else {
+            // If users table exists, just add soft deletes if not present
+            Schema::table('users', function (Blueprint $table) {
+                if (!Schema::hasColumn('users', 'deleted_at')) {
+                    $table->softDeletes();
+                }
+            });
+        }
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
