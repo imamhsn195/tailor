@@ -474,31 +474,31 @@ return [
             'submenu' => [
                 [
                     'text' => 'Customers',
-                    'url' => route('admin.customers.index'),
+                    'url' => 'admin/customers',
                     'icon' => 'fas fa-fw fa-user-friends',
                     'active' => ['admin/customers*'],
                 ],
                 [
                     'text' => 'Memberships',
-                    'url' => route('admin.memberships.index'),
+                    'url' => 'admin/memberships',
                     'icon' => 'fas fa-fw fa-id-card',
                     'active' => ['admin/memberships*'],
                 ],
                 [
                     'text' => 'Coupons',
-                    'url' => route('admin.coupons.index'),
+                    'url' => 'admin/coupons',
                     'icon' => 'fas fa-fw fa-ticket-alt',
                     'active' => ['admin/coupons*'],
                 ],
                 [
                     'text' => 'Discounts',
-                    'url' => route('admin.discounts.index'),
+                    'url' => 'admin/discounts',
                     'icon' => 'fas fa-fw fa-percent',
                     'active' => ['admin/discounts*'],
                 ],
                 [
                     'text' => 'Gift Vouchers',
-                    'url' => route('admin.gift-vouchers.index'),
+                    'url' => 'admin/gift-vouchers',
                     'icon' => 'fas fa-fw fa-gift',
                     'active' => ['admin/gift-vouchers*'],
                 ],
@@ -576,7 +576,7 @@ return [
         ],
         [
             'text' => 'Activity Logs',
-            'url' => route('admin.activity-logs.index'),
+            'url' => 'admin/activity-logs',
             'icon' => 'fas fa-fw fa-history',
             'can' => 'report.view',
         ],
