@@ -199,16 +199,26 @@ class UserController extends Controller
     {
         $this->authorize('user.edit');
 
-        // Invalidate all sessions for this user
-        // This would require implementing session management
-        // For now, just log the action
-        activity()
-            ->causedBy(auth()->user())
-            ->performedOn($user)
-            ->log('forced_logout');
+        try {
+            // Invalidate all sessions for this user
+            // This requires using database sessions or Redis
+            if (config('session.driver') === 'database') {
+                \Illuminate\Support\Facades\DB::table('sessions')
+                    ->where('user_id', $user->id)
+                    ->delete();
+            }
 
-        return redirect()->route('admin.users.show', $user)
-            ->with('success', trans_common('user_logged_out'));
+            // Log the action
+            activity()
+                ->causedBy(auth()->user())
+                ->performedOn($user)
+                ->log('forced_logout');
+
+            return redirect()->route('admin.users.show', $user)
+                ->with('success', trans_common('user_logged_out'));
+        } catch (\Exception $e) {
+            return back()->with('error', trans_common('operation_failed') . ': ' . $e->getMessage());
+        }
     }
 }
 

@@ -25,6 +25,16 @@ class SettingsController extends Controller
     {
         abort_unless(auth()->user()?->can('settings.view'), 403);
 
+        // Get statistics for settings dashboard
+        $stats = [
+            'total_users' => \App\Models\User::count(),
+            'active_users' => \App\Models\User::where('is_active', true)->count(),
+            'total_roles' => \Spatie\Permission\Models\Role::count(),
+            'blocked_ips' => \App\Models\BlockedIp::where('is_active', true)->count(),
+            'blocked_macs' => \App\Models\BlockedMac::where('is_active', true)->count(),
+            'recent_logins' => \App\Models\UserLoginHistory::latest('login_at')->limit(10)->get(),
+        ];
+
         // Get current settings from config or database
         $settings = [
             'company_name' => config('app.name'),
@@ -35,7 +45,7 @@ class SettingsController extends Controller
             'time_format' => config('app.time_format', 'H:i:s'),
         ];
 
-        return view('admin.settings.index', compact('settings'));
+        return view('admin.settings.index', compact('settings', 'stats'));
     }
 
     /**
@@ -70,3 +80,4 @@ class SettingsController extends Controller
         }
     }
 }
+

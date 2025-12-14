@@ -75,19 +75,106 @@
         </form>
     </x-adminlte-card>
 
-    <!-- Security Settings -->
-    <x-adminlte-card title="{{ trans_common('security_settings') }}" theme="warning" icon="fas fa-shield-alt">
+    <!-- Settings Overview -->
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <x-adminlte-info-box title="{{ trans_common('total_users') }}" 
+                                 text="{{ number_format($stats['total_users']) }}" 
+                                 icon="fas fa-users" 
+                                 theme="primary"/>
+        </div>
+        <div class="col-lg-3 col-6">
+            <x-adminlte-info-box title="{{ trans_common('active_users') }}" 
+                                 text="{{ number_format($stats['active_users']) }}" 
+                                 icon="fas fa-user-check" 
+                                 theme="success"/>
+        </div>
+        <div class="col-lg-3 col-6">
+            <x-adminlte-info-box title="{{ trans_common('total_roles') }}" 
+                                 text="{{ number_format($stats['total_roles']) }}" 
+                                 icon="fas fa-user-shield" 
+                                 theme="info"/>
+        </div>
+        <div class="col-lg-3 col-6">
+            <x-adminlte-info-box title="{{ trans_common('blocked_ips') }}" 
+                                 text="{{ number_format($stats['blocked_ips']) }}" 
+                                 icon="fas fa-ban" 
+                                 theme="danger"/>
+        </div>
+    </div>
+
+    <!-- User Management -->
+    <x-adminlte-card title="{{ trans_common('user_management') }}" theme="primary" icon="fas fa-users">
         <div class="row">
-            <div class="col-md-6">
-                <a href="{{ route('admin.blocked-ips.index') }}" class="btn btn-warning btn-block">
-                    <i class="fas fa-ban"></i> {{ trans_common('manage') }} {{ trans_common('blocked_ips') }}
+            <div class="col-md-4">
+                <a href="{{ route('admin.users.index') }}" class="btn btn-primary btn-block mb-2">
+                    <i class="fas fa-users"></i> {{ trans_common('manage_users') }}
                 </a>
             </div>
-            <div class="col-md-6">
-                <a href="{{ route('admin.blocked-macs.index') }}" class="btn btn-warning btn-block">
-                    <i class="fas fa-ban"></i> {{ trans_common('manage') }} {{ trans_common('blocked_macs') }}
+            <div class="col-md-4">
+                <a href="{{ route('admin.roles.index') }}" class="btn btn-info btn-block mb-2">
+                    <i class="fas fa-user-shield"></i> {{ trans_common('manage_roles') }}
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ route('admin.permissions.index') }}" class="btn btn-secondary btn-block mb-2">
+                    <i class="fas fa-key"></i> {{ trans_common('permissions') }}
                 </a>
             </div>
         </div>
     </x-adminlte-card>
+
+    <!-- Security Settings -->
+    <x-adminlte-card title="{{ trans_common('security_settings') }}" theme="warning" icon="fas fa-shield-alt">
+        <div class="row">
+            <div class="col-md-3">
+                <a href="{{ route('admin.users.index') }}" class="btn btn-warning btn-block mb-2">
+                    <i class="fas fa-history"></i> {{ trans_common('view_login_history') }}
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ route('admin.blocked-ips.index') }}" class="btn btn-danger btn-block mb-2">
+                    <i class="fas fa-ban"></i> {{ trans_common('manage_blocked_ips') }}
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ route('admin.blocked-macs.index') }}" class="btn btn-danger btn-block mb-2">
+                    <i class="fas fa-ban"></i> {{ trans_common('manage_blocked_macs') }}
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ route('admin.activity-logs.index') }}" class="btn btn-secondary btn-block mb-2">
+                    <i class="fas fa-list"></i> {{ trans_common('activity_logs') }}
+                </a>
+            </div>
+        </div>
+    </x-adminlte-card>
+
+    <!-- Recent Logins -->
+    @if($stats['recent_logins']->count() > 0)
+        <x-adminlte-card title="{{ trans_common('recent_logins') }}" theme="info" icon="fas fa-clock">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>{{ trans_common('user') }}</th>
+                            <th>{{ trans_common('ip_address') }}</th>
+                            <th>{{ trans_common('login_at') }}</th>
+                            <th>{{ trans_common('branch') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($stats['recent_logins'] as $login)
+                            <tr>
+                                <td>{{ $login->user->name ?? '-' }}</td>
+                                <td>{{ $login->ip_address }}</td>
+                                <td>{{ $login->login_at->format('Y-m-d H:i:s') }}</td>
+                                <td>{{ $login->branch->name ?? '-' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </x-adminlte-card>
+    @endif
 @stop
