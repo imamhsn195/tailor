@@ -25,6 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'identifytenant' => \App\Http\Middleware\IdentifyTenant::class,
             'ensuretenantactive' => \App\Http\Middleware\EnsureTenantActive::class,
             'ensuresubscriptionactive' => \App\Http\Middleware\EnsureSubscriptionActive::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
         
         // Exclude webhook routes from CSRF protection
