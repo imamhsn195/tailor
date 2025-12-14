@@ -94,6 +94,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     Route::resource('payment-vouchers', \App\Http\Controllers\Admin\PaymentVoucherController::class);
     Route::resource('vat-returns', \App\Http\Controllers\Admin\VatReturnController::class);
     Route::resource('expenses', \App\Http\Controllers\Admin\ExpenseController::class);
+    
+    // Reports
+    Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/orders', [\App\Http\Controllers\Admin\ReportController::class, 'orders'])->name('reports.orders');
+    Route::get('reports/sales', [\App\Http\Controllers\Admin\ReportController::class, 'sales'])->name('reports.sales');
+    Route::get('reports/inventory', [\App\Http\Controllers\Admin\ReportController::class, 'inventory'])->name('reports.inventory');
+    Route::get('reports/factory', [\App\Http\Controllers\Admin\ReportController::class, 'factory'])->name('reports.factory');
+    Route::get('reports/hr', [\App\Http\Controllers\Admin\ReportController::class, 'hr'])->name('reports.hr');
+    Route::get('reports/accounting', [\App\Http\Controllers\Admin\ReportController::class, 'accounting'])->name('reports.accounting');
 });
 
 // Subscription routes (public)

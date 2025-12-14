@@ -74,5 +74,33 @@ return [
         'used' => 'Used',
         'expired' => 'Expired',
     ],
+    
+    // Account Type
+    'account_type' => [
+        'asset' => 'Asset',
+        'liability' => 'Liability',
+        'equity' => 'Equity',
+        'income' => 'Income',
+        'expense' => 'Expense',
+    ],
+    
+    // Expense Type
+    'expense_type' => [
+        'operational' => 'Operational',
+        'administrative' => 'Administrative',
+        'marketing' => 'Marketing',
+        'utility' => 'Utility',
+        'rent' => 'Rent',
+        'salary' => 'Salary',
+        'other' => 'Other',
+    ],
+    
+    // VAT Return Status
+    'vat_return_status' => [
+        'draft' => 'Draft',
+        'submitted' => 'Submitted',
+        'approved' => 'Approved',
+        'rejected' => 'Rejected',
+    ],
 ];
 

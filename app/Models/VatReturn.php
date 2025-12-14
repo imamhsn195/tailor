@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Casts\SafeEnumCast;
+use App\Enums\VatReturnStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -28,6 +30,7 @@ class VatReturn extends Model
     ];
 
     protected $casts = [
+        'status' => SafeEnumCast::class . ':' . VatReturnStatus::class,
         'return_date' => 'date',
         'period_from' => 'date',
         'period_to' => 'date',

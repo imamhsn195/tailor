@@ -74,5 +74,33 @@ return [
         'used' => 'ব্যবহৃত',
         'expired' => 'মেয়াদ শেষ',
     ],
+    
+    // Account Type
+    'account_type' => [
+        'asset' => 'সম্পদ',
+        'liability' => 'দায়',
+        'equity' => 'ইকুইটি',
+        'income' => 'আয়',
+        'expense' => 'ব্যয়',
+    ],
+    
+    // Expense Type
+    'expense_type' => [
+        'operational' => 'পরিচালনামূলক',
+        'administrative' => 'প্রশাসনিক',
+        'marketing' => 'বিপণন',
+        'utility' => 'উপযোগিতা',
+        'rent' => 'ভাড়া',
+        'salary' => 'বেতন',
+        'other' => 'অন্যান্য',
+    ],
+    
+    // VAT Return Status
+    'vat_return_status' => [
+        'draft' => 'খসড়া',
+        'submitted' => 'জমা দেওয়া',
+        'approved' => 'অনুমোদিত',
+        'rejected' => 'প্রত্যাখ্যান',
+    ],
 ];
 

@@ -474,18 +474,33 @@ return [
             'submenu' => [
                 [
                     'text' => 'Customers',
-                    'url' => '#',
+                    'url' => route('admin.customers.index'),
                     'icon' => 'fas fa-fw fa-user-friends',
+                    'active' => ['admin/customers*'],
                 ],
                 [
                     'text' => 'Memberships',
-                    'url' => '#',
+                    'url' => route('admin.memberships.index'),
                     'icon' => 'fas fa-fw fa-id-card',
+                    'active' => ['admin/memberships*'],
+                ],
+                [
+                    'text' => 'Coupons',
+                    'url' => route('admin.coupons.index'),
+                    'icon' => 'fas fa-fw fa-ticket-alt',
+                    'active' => ['admin/coupons*'],
                 ],
                 [
                     'text' => 'Discounts',
-                    'url' => '#',
+                    'url' => route('admin.discounts.index'),
                     'icon' => 'fas fa-fw fa-percent',
+                    'active' => ['admin/discounts*'],
+                ],
+                [
+                    'text' => 'Gift Vouchers',
+                    'url' => route('admin.gift-vouchers.index'),
+                    'icon' => 'fas fa-fw fa-gift',
+                    'active' => ['admin/gift-vouchers*'],
                 ],
             ],
         ],

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Casts\SafeEnumCast;
+use App\Enums\AccountType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,6 +25,7 @@ class ChartOfAccount extends Model
     ];
 
     protected $casts = [
+        'account_type' => SafeEnumCast::class . ':' . AccountType::class,
         'opening_balance' => 'decimal:2',
         'is_active' => 'boolean',
     ];

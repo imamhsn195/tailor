@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Casts\SafeEnumCast;
+use App\Enums\ExpenseType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -27,6 +29,7 @@ class Expense extends Model
     ];
 
     protected $casts = [
+        'expense_type' => SafeEnumCast::class . ':' . ExpenseType::class,
         'expense_date' => 'date',
         'amount' => 'decimal:2',
     ];
