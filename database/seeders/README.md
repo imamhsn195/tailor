@@ -38,7 +38,14 @@ Main tenant seeder that calls all tenant-specific seeders:
 
 **Usage for a tenant:**
 ```bash
-php artisan tenants:seed --tenant={tenant_id}
+# Seed with default TenantDatabaseSeeder
+php artisan tenants:seed {tenant_id}
+
+# Or specify tenant by domain
+php artisan tenants:seed example.com
+
+# Or run a specific seeder
+php artisan tenants:seed {tenant_id} --class=ProductCategorySeeder
 ```
 
 Or programmatically:
