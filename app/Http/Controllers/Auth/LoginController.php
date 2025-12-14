@@ -125,8 +125,19 @@ class LoginController extends Controller
      */
     protected function checkIpMacAccess($user, Request $request): bool
     {
-        // TODO: Implement IP/MAC filtering based on user settings
-        // For now, allow all access
+        $ipAddress = $request->ip();
+        $macAddress = $this->getMacAddress($request);
+
+        // Check if IP is blocked
+        if ($ipAddress && \App\Models\BlockedIp::isBlocked($ipAddress)) {
+            return false;
+        }
+
+        // Check if MAC is blocked
+        if ($macAddress && \App\Models\BlockedMac::isBlocked($macAddress)) {
+            return false;
+        }
+
         return true;
     }
 }

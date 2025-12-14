@@ -14,7 +14,6 @@ class Supplier extends Model
 
     protected $fillable = [
         'name',
-        'code',
         'contact_person',
         'mobile',
         'phone',
@@ -22,12 +21,17 @@ class Supplier extends Model
         'address',
         'vat_no',
         'discount_percentage',
-        'notes',
+        'total_purchase_amount',
+        'total_paid_amount',
+        'total_due_amount',
         'is_active',
     ];
 
     protected $casts = [
         'discount_percentage' => 'decimal:2',
+        'total_purchase_amount' => 'decimal:2',
+        'total_paid_amount' => 'decimal:2',
+        'total_due_amount' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 
@@ -48,12 +52,20 @@ class Supplier extends Model
     }
 
     /**
+     * Get supplier account ledger (purchases and payments)
+     */
+    public function getAccountBalance(): float
+    {
+        return $this->total_due_amount;
+    }
+
+    /**
      * Configure activity log options
      */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'code', 'mobile', 'email', 'is_active'])
+            ->logOnly(['name', 'mobile', 'email', 'is_active', 'total_due_amount'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }

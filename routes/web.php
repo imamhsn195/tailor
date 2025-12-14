@@ -103,6 +103,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     Route::get('reports/factory', [\App\Http\Controllers\Admin\ReportController::class, 'factory'])->name('reports.factory');
     Route::get('reports/hr', [\App\Http\Controllers\Admin\ReportController::class, 'hr'])->name('reports.hr');
     Route::get('reports/accounting', [\App\Http\Controllers\Admin\ReportController::class, 'accounting'])->name('reports.accounting');
+    
+    // Purchase & Supplier Management
+    Route::get('suppliers/{supplier}/ledger', [\App\Http\Controllers\Admin\SupplierController::class, 'ledger'])->name('suppliers.ledger');
+    Route::resource('suppliers', \App\Http\Controllers\Admin\SupplierController::class);
+    Route::resource('purchases', \App\Http\Controllers\Admin\PurchaseController::class);
+    Route::resource('supplier-payments', \App\Http\Controllers\Admin\SupplierPaymentController::class);
+    
+    // Settings
+    Route::get('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
+    Route::put('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
+    Route::resource('blocked-ips', \App\Http\Controllers\Admin\BlockedIpController::class);
+    Route::resource('blocked-macs', \App\Http\Controllers\Admin\BlockedMacController::class);
 });
 
 // Subscription routes (public)
