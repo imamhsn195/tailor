@@ -20,6 +20,13 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
         ]);
         
+        // Register middleware aliases
+        $middleware->alias([
+            'identifytenant' => \App\Http\Middleware\IdentifyTenant::class,
+            'ensuretenantactive' => \App\Http\Middleware\EnsureTenantActive::class,
+            'ensuresubscriptionactive' => \App\Http\Middleware\EnsureSubscriptionActive::class,
+        ]);
+        
         // Exclude webhook routes from CSRF protection
         $middleware->validateCsrfTokens(except: [
             'webhook/*',

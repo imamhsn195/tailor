@@ -17,7 +17,12 @@ class LoginController extends Controller
     public function showLoginForm()
     {
         if (Auth::check()) {
-            return redirect()->route('admin.dashboard');
+            // Check if tenant is available, otherwise redirect to subscriptions
+            $tenant = \Spatie\Multitenancy\Models\Tenant::current();
+            if ($tenant) {
+                return redirect()->route('admin.dashboard');
+            }
+            return redirect()->route('subscriptions.index');
         }
 
         return view('auth.login');
@@ -60,7 +65,12 @@ class LoginController extends Controller
                 ]);
             }
 
-            return redirect()->intended(route('admin.dashboard'));
+            // Check if tenant is available, otherwise redirect to subscriptions
+            $tenant = \Spatie\Multitenancy\Models\Tenant::current();
+            if ($tenant) {
+                return redirect()->intended(route('admin.dashboard'));
+            }
+            return redirect()->intended(route('subscriptions.index'));
         }
 
         throw ValidationException::withMessages([

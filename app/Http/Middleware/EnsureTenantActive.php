@@ -19,7 +19,9 @@ class EnsureTenantActive
         $tenant = Tenant::current();
         
         if (!$tenant) {
-            abort(404, 'Tenant not found');
+            // Redirect to subscriptions page to create a tenant
+            return redirect()->route('subscriptions.index')
+                ->with('info', 'Please create a subscription to access the admin area.');
         }
         
         if (!$tenant->isActive()) {

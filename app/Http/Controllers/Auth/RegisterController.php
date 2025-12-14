@@ -49,7 +49,9 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('admin.dashboard');
+        // Redirect to subscriptions page to create a tenant
+        // Admin dashboard requires a tenant context
+        return redirect()->route('subscriptions.index');
     }
 }
 
