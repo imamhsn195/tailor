@@ -140,8 +140,11 @@ class TenantProvisioningService
         $tenant->makeCurrent();
         
         try {
-            // Create default roles and permissions
-            $this->createDefaultRolesAndPermissions();
+            // Seed all default data using TenantDatabaseSeeder
+            Artisan::call('db:seed', [
+                '--class' => 'TenantDatabaseSeeder',
+                '--database' => 'tenant',
+            ]);
             
             // Create admin user
             $this->createAdminUser($adminData);
@@ -153,7 +156,7 @@ class TenantProvisioningService
 
     /**
      * Create default roles and permissions
-     *
+     * @deprecated Use RolesAndPermissionsSeeder instead
      * @return void
      */
     protected function createDefaultRolesAndPermissions(): void

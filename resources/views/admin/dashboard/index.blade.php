@@ -9,7 +9,7 @@
 @section('content')
     <!-- Filters -->
     <x-adminlte-card title="{{ trans_common('filters') }}" theme="info" icon="fas fa-filter">
-        <form method="GET" action="{{ route('admin.dashboard.index') }}" class="row">
+        <form method="GET" action="{{ route('admin.dashboard') }}" class="row">
             <div class="col-md-3">
                 <label>{{ trans_common('branch') }}</label>
                 <select name="branch_id" class="form-control">
