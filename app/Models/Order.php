@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Order extends Model
 {
@@ -85,6 +86,22 @@ class Order extends Model
     public function measurements(): HasMany
     {
         return $this->hasMany(Measurement::class);
+    }
+
+    /**
+     * Get cuttings for this order
+     */
+    public function cuttings(): HasMany
+    {
+        return $this->hasMany(Cutting::class);
+    }
+
+    /**
+     * Get deliveries for this order
+     */
+    public function deliveries(): HasMany
+    {
+        return $this->hasMany(Delivery::class);
     }
 
     /**

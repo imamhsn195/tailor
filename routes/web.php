@@ -55,6 +55,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     Route::get('inventory/stock-out', [\App\Http\Controllers\Admin\InventoryController::class, 'stockOut'])->name('inventory.stock-out');
     Route::post('inventory/stock-out', [\App\Http\Controllers\Admin\InventoryController::class, 'processStockOut'])->name('inventory.stock-out.process');
     Route::resource('inventory', \App\Http\Controllers\Admin\InventoryController::class)->only(['index', 'show']);
+    
+    // Order Management
+    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
 });
 
 // Subscription routes (public)

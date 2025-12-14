@@ -3,42 +3,32 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class MeasurementTemplate extends Model
+class CuttingMaster extends Model
 {
     use SoftDeletes, LogsActivity;
 
     protected $fillable = [
-        'product_id',
         'name',
-        'fields',
-        'is_default',
+        'mobile',
+        'address',
+        'is_active',
     ];
 
     protected $casts = [
-        'fields' => 'array',
-        'is_default' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     /**
-     * Get the product this template belongs to
+     * Get cuttings assigned to this master
      */
-    public function product(): BelongsTo
+    public function cuttings(): HasMany
     {
-        return $this->belongsTo(Product::class);
-    }
-
-    /**
-     * Get measurements using this template
-     */
-    public function measurements(): HasMany
-    {
-        return $this->hasMany(Measurement::class, 'measurement_template_id');
+        return $this->hasMany(Cutting::class);
     }
 
     /**
@@ -47,7 +37,7 @@ class MeasurementTemplate extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'product_id', 'is_default'])
+            ->logOnly(['name', 'mobile', 'is_active'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
