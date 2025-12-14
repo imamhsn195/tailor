@@ -7,33 +7,72 @@
 @stop
 
 @section('content')
+    @if(session('error'))
+        <x-adminlte-alert theme="danger" title="Error">
+            {{ session('error') }}
+        </x-adminlte-alert>
+    @endif
+
     <x-adminlte-card title="Create Tenant" theme="primary" icon="fas fa-building">
         <form action="{{ route('super-admin.tenants.store') }}" method="POST">
             @csrf
 
-            <x-adminlte-input name="name" 
-                              label="Tenant Name" 
-                              value="{{ old('name') }}" 
-                              required />
+            <div class="row">
+                <div class="col-md-6">
+                    <x-adminlte-input name="name" 
+                                      label="Tenant Name" 
+                                      value="{{ old('name') }}" 
+                                      placeholder="Company Name"
+                                      required />
+                </div>
+                <div class="col-md-6">
+                    <x-adminlte-input name="domain" 
+                                      label="Domain" 
+                                      value="{{ old('domain') }}" 
+                                      placeholder="example.com"
+                                      required />
+                    <small class="form-text text-muted">Must be unique. Used for tenant identification.</small>
+                </div>
+            </div>
 
-            <x-adminlte-input name="domain" 
-                              label="Domain" 
-                              value="{{ old('domain') }}" 
-                              placeholder="example.com"
-                              required />
+            <hr>
+            <h5>Admin User Credentials</h5>
 
-            <x-adminlte-input name="database_name" 
-                              label="Database Name" 
-                              value="{{ old('database_name') }}" 
-                              required />
+            <div class="row">
+                <div class="col-md-6">
+                    <x-adminlte-input name="email" 
+                                      type="email"
+                                      label="Admin Email" 
+                                      value="{{ old('email') }}" 
+                                      placeholder="admin@example.com"
+                                      required />
+                </div>
+                <div class="col-md-6">
+                    <x-adminlte-input name="password" 
+                                      type="password"
+                                      label="Admin Password" 
+                                      value="{{ old('password') }}" 
+                                      placeholder="Minimum 8 characters"
+                                      required />
+                    <small class="form-text text-muted">Minimum 8 characters</small>
+                </div>
+            </div>
 
-            <div class="form-group">
-                <label>Status</label>
-                <select name="status" class="form-control" required>
-                    <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="suspended" {{ old('status') == 'suspended' ? 'selected' : '' }}>Suspended</option>
-                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                </select>
+            <div class="row">
+                <div class="col-md-6">
+                    <x-adminlte-input name="trial_days" 
+                                      type="number"
+                                      label="Trial Days (Optional)" 
+                                      value="{{ old('trial_days', 0) }}" 
+                                      min="0"
+                                      placeholder="0" />
+                    <small class="form-text text-muted">Number of trial days. Leave 0 for no trial.</small>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> 
+                <strong>Note:</strong> The tenant database will be created automatically with all migrations and default seeders.
             </div>
 
             <div class="mt-3">
