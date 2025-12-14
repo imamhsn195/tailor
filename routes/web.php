@@ -36,6 +36,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'identifytenant', 'e
     Route::get('activity-logs/{activityLog}', [\App\Http\Controllers\Admin\ActivityLogController::class, 'show'])->name('activity-logs.show');
     Route::delete('activity-logs/clean', [\App\Http\Controllers\Admin\ActivityLogController::class, 'clean'])->name('activity-logs.clean');
     
+    // System Logs
+    Route::get('system-logs', [\App\Http\Controllers\SystemLogController::class, 'index'])->name('system-logs.index');
+    Route::delete('system-logs', [\App\Http\Controllers\SystemLogController::class, 'destroy'])->name('system-logs.destroy');
+    Route::delete('system-logs/bulk', [\App\Http\Controllers\SystemLogController::class, 'bulkDestroy'])->name('system-logs.bulk-destroy');
+    
     // User Management
     Route::post('users/{user}/force-logout', [\App\Http\Controllers\Admin\UserController::class, 'forceLogout'])->name('users.force-logout');
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);

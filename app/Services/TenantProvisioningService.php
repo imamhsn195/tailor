@@ -200,6 +200,9 @@ class TenantProvisioningService
             
             // Settings
             'settings.view', 'settings.edit',
+            
+            // System Logs
+            'system-log.view', 'system-log.delete',
         ];
         
         foreach ($permissions as $permission) {
