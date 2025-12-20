@@ -131,11 +131,25 @@ class PaymentWebhookController extends Controller
             }
 
             if ($subscription) {
+                // Calculate period end based on billing cycle
+                $plan = $subscription->plan;
+                $periodEnd = now();
+                
+                if ($plan) {
+                    if ($plan->billing_cycle === 'yearly') {
+                        $periodEnd = now()->addYear();
+                    } else {
+                        $periodEnd = now()->addMonth();
+                    }
+                } else {
+                    $periodEnd = now()->addMonth(); // Default to monthly
+                }
+
                 // Update subscription status
                 $subscription->update([
                     'status' => 'active',
                     'current_period_start' => now(),
-                    'current_period_end' => now()->addMonth(), // Adjust based on billing cycle
+                    'current_period_end' => $periodEnd,
                 ]);
 
                 // Link transaction to subscription

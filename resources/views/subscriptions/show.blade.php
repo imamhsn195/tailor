@@ -65,6 +65,27 @@
                         <input type="text" name="domain" class="form-control" required placeholder="yourdomain.com">
                     </div>
 
+                    <div class="form-group">
+                        <label>Your Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" required placeholder="John Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address <span class="text-danger">*</span></label>
+                        <input type="email" name="email" class="form-control" required placeholder="john@example.com">
+                        <small class="form-text text-muted">This will be used as your admin account email</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" name="customer_phone" class="form-control" placeholder="+1234567890">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea name="customer_address" class="form-control" rows="2" placeholder="Your address"></textarea>
+                    </div>
+
                     <button type="submit" class="btn btn-primary btn-block">
                         <i class="fas fa-credit-card"></i> Proceed to Payment
                     </button>
