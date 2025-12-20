@@ -24,11 +24,24 @@ class PaymentWebhookController extends Controller
      */
     public function stripe(Request $request)
     {
-        // Laravel Cashier handles Stripe webhooks automatically
-        // This is for custom handling if needed
-        $payload = $request->all();
+        $payload = $request->getContent();
+        $signature = $request->header('Stripe-Signature');
+        $webhookSecret = config('services.stripe.webhook_secret');
+
+        // Verify webhook signature if secret is configured
+        if ($webhookSecret) {
+            $gateway = $this->paymentService->getGateway('stripe');
+            if ($gateway && method_exists($gateway, 'verifyWebhookSignature')) {
+                if (!$gateway->verifyWebhookSignature($payload, $signature, $webhookSecret)) {
+                    Log::warning('Stripe webhook signature verification failed');
+                    return response()->json(['error' => 'Invalid signature'], 400);
+                }
+            }
+        }
+
+        $payloadArray = json_decode($payload, true);
         
-        return $this->handleWebhook('stripe', $payload);
+        return $this->handleWebhook('stripe', $payloadArray);
     }
 
     /**
