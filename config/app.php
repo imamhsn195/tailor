@@ -123,4 +123,18 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Super Admin Emails
+    |--------------------------------------------------------------------------
+    |
+    | List of email addresses that have super admin access to the system.
+    | These users can access the super admin panel at /super-admin/*
+    |
+    */
+
+    'super_admin_emails' => array_filter(
+        explode(',', (string) env('SUPER_ADMIN_EMAILS', ''))
+    ),
+
 ];

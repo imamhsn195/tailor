@@ -5,8 +5,8 @@ use App\Http\Controllers\PaymentWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('theme-default::pages.home');
+})->name('home');
 
 // Authentication routes (public, no tenant required)
 Route::middleware('guest')->group(function () {
@@ -21,6 +21,20 @@ Route::middleware('guest')->group(function () {
 // Logout (requires authentication)
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+    
+    // Dashboard route - redirects to appropriate dashboard based on user role
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        $superAdminEmails = config('app.super_admin_emails', []);
+        
+        // Check if user is super admin
+        if (in_array($user->email, $superAdminEmails)) {
+            return redirect()->route('super-admin.dashboard');
+        }
+        
+        // Otherwise redirect to admin dashboard
+        return redirect()->route('admin.dashboard');
+    })->name('dashboard');
 });
 
 // Admin routes (require authentication and tenant context)

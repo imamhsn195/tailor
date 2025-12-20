@@ -19,13 +19,16 @@ if (!function_exists('currency_format')) {
     /**
      * Format currency amount
      *
-     * @param float|int $amount
+     * @param float|int|null $amount
      * @param string $currency
      * @param int $decimals
      * @return string
      */
-    function currency_format(float|int $amount, string $currency = 'BDT', int $decimals = 2): string
+    function currency_format(float|int|null $amount, string $currency = 'BDT', int $decimals = 2): string
     {
+        // Handle null values by defaulting to 0
+        $amount = $amount ?? 0;
+        
         $symbols = [
             'BDT' => '৳',
             'USD' => '$',

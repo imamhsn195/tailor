@@ -124,14 +124,40 @@ class SystemHealthController extends Controller
     {
         try {
             $driver = config('cache.default');
+            $store = Cache::getStore();
+            $status = 'unknown';
+            
+            // Try to ping Redis if it's a Redis store
+            if (method_exists($store, 'getRedis') && $store->getRedis()) {
+                try {
+                    $redis = $store->getRedis();
+                    if (method_exists($redis, 'ping')) {
+                        $status = $redis->ping() ? 'connected' : 'disconnected';
+                    }
+                } catch (\Exception $e) {
+                    $status = 'error: ' . $e->getMessage();
+                }
+            } else {
+                // For other drivers (database, file, etc.), test by setting/getting a value
+                try {
+                    $testKey = 'health_check_' . time();
+                    Cache::put($testKey, 'test', 1);
+                    $value = Cache::get($testKey);
+                    Cache::forget($testKey);
+                    $status = $value === 'test' ? 'working' : 'error';
+                } catch (\Exception $e) {
+                    $status = 'error: ' . $e->getMessage();
+                }
+            }
             
             return [
                 'driver' => $driver,
-                'status' => Cache::getStore()->getStore()->ping() ?? 'unknown',
+                'status' => $status,
             ];
         } catch (\Exception $e) {
             return [
-                'error' => $e->getMessage(),
+                'driver' => config('cache.default', 'unknown'),
+                'status' => 'error: ' . $e->getMessage(),
             ];
         }
     }
