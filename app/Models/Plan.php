@@ -35,6 +35,32 @@ class Plan extends Model
         'sort_order' => 'integer',
     ];
 
+    /**
+     * Get the price based on default currency
+     */
+    public function getPriceAttribute()
+    {
+        // Default to BDT (Bangladeshi Taka) if currency config is not set
+        $defaultCurrency = config('app.currency', 'BDT');
+        
+        if ($defaultCurrency === 'USD') {
+            return $this->price_usd;
+        }
+        
+        return $this->price_bdt;
+    }
+
+    /**
+     * Get formatted price with currency symbol
+     */
+    public function getFormattedPriceAttribute()
+    {
+        $defaultCurrency = config('app.currency', 'BDT');
+        $price = $this->price;
+        
+        return currency_format($price, $defaultCurrency);
+    }
+
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);

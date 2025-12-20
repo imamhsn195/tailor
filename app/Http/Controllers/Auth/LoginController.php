@@ -87,11 +87,15 @@ class LoginController extends Controller
 
         // Update logout time in login history
         if ($user) {
-            UserLoginHistory::where('user_id', $user->id)
-                ->whereNull('logout_at')
-                ->latest('login_at')
-                ->first()
-                ?->update(['logout_at' => now()]);
+            try {
+                UserLoginHistory::where('user_id', $user->id)
+                    ->whereNull('logout_at')
+                    ->latest('login_at')
+                    ->first()
+                    ?->update(['logout_at' => now()]);
+            } catch (\Exception $e) {
+                Log::error('Failed to update logout time in login history: ' . $e->getMessage());
+            }
         }
 
         Auth::logout();
