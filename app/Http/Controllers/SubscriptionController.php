@@ -6,6 +6,7 @@ use App\Models\Plan;
 use App\Models\Tenant;
 use App\Services\PaymentGatewayService;
 use App\Services\TenantProvisioningService;
+use App\Jobs\ProvisionTenantDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -99,6 +100,12 @@ class SubscriptionController extends Controller
                 'plan_id' => $plan->id,
                 'status' => 'pending',
                 'trial_ends_at' => $plan->trial_days > 0 ? now()->addDays($plan->trial_days) : null,
+                'metadata' => [
+                    'customer_email' => $validated['email'],
+                    'customer_name' => $validated['name'],
+                    'customer_phone' => $validated['customer_phone'] ?? null,
+                    'customer_address' => $validated['customer_address'] ?? null,
+                ],
             ]);
 
             Log::channel('subscription')->info('Subscription created', [
@@ -250,7 +257,72 @@ class SubscriptionController extends Controller
                         Log::channel('subscription')->info('Activating tenant from success callback (webhook fallback)', [
                             'tenant_id' => $tenant->id,
                         ]);
-                        $tenant->update(['status' => 'active']);
+                        
+                        // Get customer email from subscription metadata or tenant data
+                        $metadata = is_array($subscription->metadata) ? $subscription->metadata : (json_decode($subscription->metadata, true) ?? []);
+                        $tenantData = is_array($tenant->data) ? $tenant->data : (json_decode($tenant->data, true) ?? []);
+                        
+                        $customerEmail = $metadata['customer_email'] ?? 
+                                        $tenantData['email'] ?? 
+                                        'admin@' . $tenant->domain;
+                        $customerName = $metadata['customer_name'] ?? 
+                                        $tenantData['name'] ?? 
+                                        'Admin';
+                        
+                        // Check if tenant database already exists (might have been provisioned by webhook)
+                        $databaseExists = false;
+                        try {
+                            $host = config('database.connections.mysql.host', '127.0.0.1');
+                            $port = config('database.connections.mysql.port', '3306');
+                            $username = config('database.connections.mysql.username', 'root');
+                            $password = config('database.connections.mysql.password', '');
+                            
+                            $connection = new \PDO(
+                                "mysql:host={$host};port={$port}",
+                                $username,
+                                $password,
+                                [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]
+                            );
+                            
+                            $stmt = $connection->query("SHOW DATABASES LIKE '{$tenant->database_name}'");
+                            $databaseExists = $stmt->rowCount() > 0;
+                        } catch (\Exception $e) {
+                            Log::channel('subscription')->warning('Could not check if database exists: ' . $e->getMessage());
+                        }
+                        
+                        // Only provision if database doesn't exist
+                        if (!$databaseExists) {
+                            // Provision tenant database and send welcome email
+                            Log::channel('subscription')->info('Provisioning tenant from success callback', [
+                                'tenant_id' => $tenant->id,
+                                'email' => $customerEmail,
+                            ]);
+                            
+                            ProvisionTenantDatabase::dispatch($tenant, [
+                                'email' => $customerEmail,
+                                'name' => $customerName,
+                                'send_email' => true,
+                            ]);
+                        } else {
+                            // Database exists but email might not have been sent
+                            Log::channel('subscription')->info('Tenant database already exists, sending welcome email only', [
+                                'tenant_id' => $tenant->id,
+                                'email' => $customerEmail,
+                            ]);
+                            
+                            // Just send the email without provisioning
+                            // Note: If database exists but user doesn't, we still need to provision
+                            // So we'll provision anyway to ensure everything is set up
+                            Log::channel('subscription')->info('Database exists but provisioning anyway to ensure user and email are sent', [
+                                'tenant_id' => $tenant->id,
+                            ]);
+                            
+                            ProvisionTenantDatabase::dispatch($tenant, [
+                                'email' => $customerEmail,
+                                'name' => $customerName,
+                                'send_email' => true,
+                            ]);
+                        }
                         
                         // Also update subscription status if still pending
                         if ($subscription->status === 'pending') {

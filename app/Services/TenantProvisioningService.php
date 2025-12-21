@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\Tenant;
+use App\Mail\TenantWelcomeEmail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -146,6 +148,9 @@ class TenantProvisioningService
                 '--database' => 'tenant',
             ]);
             
+            // Add tenant to admin data for email sending
+            $adminData['tenant'] = $tenant;
+            
             // Create admin user
             $this->createAdminUser($adminData);
             
@@ -262,13 +267,23 @@ class TenantProvisioningService
         
         // Check if user already exists
         $user = \App\Models\User::where('email', $email)->first();
+        $isNewUser = false;
         
         if (!$user) {
+            $isNewUser = true;
             $user = \App\Models\User::create([
                 'name' => $name,
                 'email' => $email,
                 'password' => Hash::make($password),
                 'email_verified_at' => now(),
+                'is_active' => true,
+            ]);
+        } else {
+            // User exists - generate new password and update it
+            // This ensures we can send the password in the email
+            $password = Str::random(12);
+            $user->update([
+                'password' => Hash::make($password),
                 'is_active' => true,
             ]);
         }
@@ -279,10 +294,84 @@ class TenantProvisioningService
             $user->assignRole($superAdminRole);
         }
         
-        // Store password for email (in real scenario, send email)
+        // Send welcome email with credentials
         if (isset($adminData['send_email']) && $adminData['send_email']) {
-            // TODO: Send welcome email with credentials
+            $this->sendWelcomeEmail($adminData['tenant'], $email, $password);
         }
+    }
+
+    /**
+     * Send welcome email to tenant admin
+     *
+     * @param Tenant $tenant
+     * @param string $email
+     * @param string $password
+     * @return void
+     */
+    protected function sendWelcomeEmail(Tenant $tenant, string $email, string $password): void
+    {
+        try {
+            // Get login URL based on tenant domain
+            $loginUrl = $this->getTenantLoginUrl($tenant);
+            
+            // Send email from landlord context (not tenant context)
+            // We need to ensure we're not in tenant context when sending
+            $currentTenant = Tenant::current();
+            Tenant::forgetCurrent();
+            
+            try {
+                Mail::to($email)->send(new TenantWelcomeEmail($tenant, $email, $password, $loginUrl));
+            } finally {
+                // Restore tenant context if it existed
+                if ($currentTenant) {
+                    $currentTenant->makeCurrent();
+                }
+            }
+        } catch (\Exception $e) {
+            // Log error but don't fail provisioning
+            \Illuminate\Support\Facades\Log::error('Failed to send welcome email to tenant: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get login URL for tenant
+     *
+     * @param Tenant $tenant
+     * @return string
+     */
+    public function getTenantLoginUrl(Tenant $tenant): string
+    {
+        $mainDomain = config('app.main_domain', parse_url(config('app.url'), PHP_URL_HOST));
+        $scheme = parse_url(config('app.url'), PHP_URL_SCHEME) ?? 'http';
+        
+        // Try to get primary domain first
+        $primaryDomain = $tenant->primaryDomain();
+        if ($primaryDomain && $primaryDomain->is_verified) {
+            return $scheme . '://' . $primaryDomain->domain . '/login';
+        }
+        
+        // Get tenant domain
+        $tenantDomain = $tenant->domain;
+        if ($tenantDomain) {
+            // If domain already contains .test, .localhost, or is a full domain, use it as-is
+            if (str_contains($tenantDomain, '.test') || 
+                str_contains($tenantDomain, '.localhost') || 
+                str_contains($tenantDomain, '.') && !str_ends_with($tenantDomain, $mainDomain)) {
+                return $scheme . '://' . $tenantDomain . '/login';
+            }
+            
+            // Otherwise, construct as subdomain
+            // For local development (.test, .localhost)
+            if (str_contains($mainDomain, 'localhost') || str_contains($mainDomain, '127.0.0.1') || str_contains($mainDomain, '.test')) {
+                return $scheme . '://' . $tenantDomain . '.' . $mainDomain . '/login';
+            }
+            
+            // For production
+            return $scheme . '://' . $tenantDomain . '.' . $mainDomain . '/login';
+        }
+        
+        // Final fallback
+        return config('app.url') . '/login';
     }
 
     /**

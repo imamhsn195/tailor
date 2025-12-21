@@ -21,7 +21,15 @@ class TenantFinder extends BaseTenantFinder
             ->where('status', 'active')
             ->first();
         
-        // If no custom domain found, try subdomain
+        // If no custom domain found, check if host matches tenant domain directly
+        // (for cases where tenant domain is stored as full domain like "asiafashoin222.test")
+        if (!$tenant) {
+            $tenant = Tenant::where('domain', $host)
+                ->where('status', 'active')
+                ->first();
+        }
+        
+        // If still not found, try subdomain extraction
         if (!$tenant) {
             $subdomain = $this->extractSubdomain($host);
             
