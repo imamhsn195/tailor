@@ -50,6 +50,14 @@ class Tenant extends BaseTenant
     }
 
     /**
+     * Get all subscriptions for this tenant
+     */
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    /**
      * Get active subscription
      */
     public function activeSubscription(): HasOne

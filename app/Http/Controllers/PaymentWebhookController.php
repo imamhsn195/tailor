@@ -28,18 +28,32 @@ class PaymentWebhookController extends Controller
         $signature = $request->header('Stripe-Signature');
         $webhookSecret = config('services.stripe.webhook_secret');
 
+        Log::channel('subscription')->info('=== STRIPE WEBHOOK RECEIVED ===', [
+            'has_signature' => !empty($signature),
+            'has_webhook_secret' => !empty($webhookSecret),
+            'payload_length' => strlen($payload),
+        ]);
+
         // Verify webhook signature if secret is configured
         if ($webhookSecret) {
             $gateway = $this->paymentService->getGateway('stripe');
             if ($gateway && method_exists($gateway, 'verifyWebhookSignature')) {
                 if (!$gateway->verifyWebhookSignature($payload, $signature, $webhookSecret)) {
-                    Log::warning('Stripe webhook signature verification failed');
+                    Log::channel('subscription')->warning('Stripe webhook signature verification failed');
                     return response()->json(['error' => 'Invalid signature'], 400);
                 }
+                Log::channel('subscription')->info('Stripe webhook signature verified');
             }
+        } else {
+            Log::channel('subscription')->warning('Stripe webhook secret not configured, skipping signature verification');
         }
 
         $payloadArray = json_decode($payload, true);
+        
+        Log::channel('subscription')->info('Processing Stripe webhook', [
+            'event_type' => $payloadArray['type'] ?? 'unknown',
+            'event_id' => $payloadArray['id'] ?? null,
+        ]);
         
         return $this->handleWebhook('stripe', $payloadArray);
     }
@@ -86,15 +100,29 @@ class PaymentWebhookController extends Controller
     protected function handleWebhook(string $gateway, array $payload): \Illuminate\Http\JsonResponse
     {
         try {
+            Log::channel('subscription')->info('Handling webhook', [
+                'gateway' => $gateway,
+                'event_type' => $payload['type'] ?? 'unknown',
+            ]);
+
             $result = $this->paymentService->handleWebhook($gateway, $payload);
 
+            Log::channel('subscription')->info('Webhook processed by gateway', [
+                'gateway' => $gateway,
+                'result_status' => $result['status'] ?? 'unknown',
+            ]);
+
             if ($result['status'] === 'success') {
+                Log::channel('subscription')->info('Processing successful payment from webhook');
                 $this->processSuccessfulPayment($gateway, $result);
             }
 
             return response()->json(['status' => 'ok']);
         } catch (\Exception $e) {
-            Log::error("Webhook processing error ({$gateway}): " . $e->getMessage());
+            Log::channel('subscription')->error("Webhook processing error ({$gateway})", [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json(['status' => 'error'], 500);
         }
     }
