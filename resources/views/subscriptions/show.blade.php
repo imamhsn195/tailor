@@ -18,7 +18,7 @@
                     </tr>
                     <tr>
                         <th>Price</th>
-                        <td><strong>{{ currency_format($plan->price) }}</strong></td>
+                        <td><strong>{{ $plan->formatted_price }}</strong></td>
                     </tr>
                     <tr>
                         <th>Billing Cycle</th>

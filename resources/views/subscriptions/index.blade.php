@@ -13,7 +13,7 @@
                 <div class="col-md-4">
                     <x-adminlte-card title="{{ $plan->name }}" theme="info" icon="fas fa-star">
                         <div class="text-center mb-3">
-                            <h2>{{ currency_format($plan->price) }}</h2>
+                            <h2>{{ $plan->formatted_price }}</h2>
                             <p class="text-muted">{{ $plan->billing_cycle }}</p>
                         </div>
                         

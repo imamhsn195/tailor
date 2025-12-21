@@ -41,7 +41,7 @@
                     </tr>
                     <tr>
                         <th>Amount</th>
-                        <td>{{ currency_format($subscription->plan->price ?? 0) }}</td>
+                        <td>{{ $subscription->plan->formatted_price ?? currency_format(0, config('app.currency', 'BDT')) }}</td>
                     </tr>
                 </table>
             </div>
