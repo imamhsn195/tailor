@@ -321,6 +321,67 @@ return [
             'icon' => 'fas fa-fw fa-tachometer-alt',
             'active' => ['admin/dashboard*'],
         ],
+        // Super Admin Menu (only visible to super admins)
+        [
+            'text' => 'Super Admin',
+            'icon' => 'fas fa-fw fa-shield-alt',
+            'can' => function() {
+                $user = auth()->user();
+                if (!$user) return false;
+                $superAdminEmails = config('app.super_admin_emails', []);
+                return in_array($user->email, $superAdminEmails);
+            },
+            'submenu' => [
+                [
+                    'text' => 'Dashboard',
+                    'url' => 'super-admin/dashboard',
+                    'icon' => 'fas fa-fw fa-tachometer-alt',
+                    'active' => ['super-admin/dashboard*'],
+                    'can' => function() {
+                        $user = auth()->user();
+                        if (!$user) return false;
+                        $superAdminEmails = config('app.super_admin_emails', []);
+                        return in_array($user->email, $superAdminEmails);
+                    },
+                ],
+                [
+                    'text' => 'Tenants',
+                    'url' => 'super-admin/tenants',
+                    'icon' => 'fas fa-fw fa-building',
+                    'active' => ['super-admin/tenants*'],
+                    'can' => function() {
+                        $user = auth()->user();
+                        if (!$user) return false;
+                        $superAdminEmails = config('app.super_admin_emails', []);
+                        return in_array($user->email, $superAdminEmails);
+                    },
+                ],
+                [
+                    'text' => 'Subscriptions',
+                    'url' => 'super-admin/subscriptions',
+                    'icon' => 'fas fa-fw fa-credit-card',
+                    'active' => ['super-admin/subscriptions*'],
+                    'can' => function() {
+                        $user = auth()->user();
+                        if (!$user) return false;
+                        $superAdminEmails = config('app.super_admin_emails', []);
+                        return in_array($user->email, $superAdminEmails);
+                    },
+                ],
+                [
+                    'text' => 'System Health',
+                    'url' => 'super-admin/system-health',
+                    'icon' => 'fas fa-fw fa-heartbeat',
+                    'active' => ['super-admin/system-health*'],
+                    'can' => function() {
+                        $user = auth()->user();
+                        if (!$user) return false;
+                        $superAdminEmails = config('app.super_admin_emails', []);
+                        return in_array($user->email, $superAdminEmails);
+                    },
+                ],
+            ],
+        ],
         ['header' => 'MAIN MENU'],
         [
             'text' => 'Orders',
