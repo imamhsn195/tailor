@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Tenant;
 use App\Mail\TenantWelcomeEmail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -28,6 +29,11 @@ class TenantProvisioningService
         // Ensure we're using landlord connection
         $tenant->setConnection('landlord');
         
+        // Ensure database_name is set
+        if (empty($tenant->database_name)) {
+            throw new Exception("Tenant database_name is not set. Cannot provision tenant.");
+        }
+        
         // Create database
         $this->createDatabase($tenant);
         
@@ -37,8 +43,24 @@ class TenantProvisioningService
         // Seed default data
         $this->seedDefaultData($tenant, $adminData);
         
-        // Update tenant status
+        // Update tenant status and refresh to ensure all fields are current
         $tenant->update(['status' => 'active']);
+        
+        // Refresh tenant from database to ensure all attributes are current
+        // This is critical because the tenant connection might be cached
+        $tenant->refresh();
+        
+        // Verify database_name is still set after refresh
+        if (empty($tenant->database_name)) {
+            throw new Exception("Tenant database_name became empty after refresh. This should not happen.");
+        }
+        
+        // Ensure tenant connection is cleared so it will be properly reconfigured
+        // when the tenant is identified again in the next request
+        DB::purge('tenant');
+        if (DB::getConnections()['tenant'] ?? null) {
+            DB::disconnect('tenant');
+        }
     }
 
     /**
@@ -105,28 +127,41 @@ class TenantProvisioningService
                 ]);
             }
             
-            // Run Spatie Permission migrations
-            Artisan::call('migrate', [
-                '--database' => 'tenant',
-                '--force' => true,
-            ]);
-            
-            // Publish Spatie Activity Log migrations if not already published
-            if (!file_exists($permissionMigrationsPath . '/2020_01_01_000000_create_activity_log_table.php')) {
-                Artisan::call('vendor:publish', [
-                    '--provider' => 'Spatie\Activitylog\ActivitylogServiceProvider',
-                    '--tag' => 'activitylog-migrations',
+            // Run Spatie Permission and Activity Log migrations
+            // Use a try-catch to handle cases where tables already exist (from other migration sources)
+            try {
+                Artisan::call('migrate', [
+                    '--path' => 'database/migrations',
+                    '--database' => 'tenant',
+                    '--force' => true,
                 ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                // If migration fails due to table already existing, it's likely from another source
+                // Log the error but don't fail provisioning - the table exists which is what matters
+                if (str_contains($e->getMessage(), 'already exists')) {
+                    \Log::warning('Migration conflict: Table already exists. This may be from another migration source.', [
+                        'error' => $e->getMessage(),
+                        'tenant' => $tenant->id,
+                    ]);
+                    // Continue - the table exists which is the desired end state
+                } else {
+                    // Re-throw if it's a different error
+                    throw $e;
+                }
             }
-            
-            // Run Activity Log migrations
-            Artisan::call('migrate', [
-                '--database' => 'tenant',
-                '--force' => true,
-            ]);
             
         } finally {
             Tenant::forgetCurrent();
+            
+            // Clear the tenant connection to ensure it's properly reconfigured on next use
+            // This ensures that when the tenant is identified again, the connection will be
+            // properly configured with the database name
+            DB::purge('tenant');
+            
+            // Also clear the connection from the connection manager to force reconfiguration
+            if (DB::getConnections()['tenant'] ?? null) {
+                DB::disconnect('tenant');
+            }
         }
     }
 

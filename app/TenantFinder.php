@@ -40,6 +40,16 @@ class TenantFinder extends BaseTenantFinder
             }
         }
         
+        // Ensure tenant has database_name set before returning
+        // This is critical for Spatie Multitenancy to properly configure the connection
+        if ($tenant && empty($tenant->database_name)) {
+            \Log::error('Tenant found but database_name is empty', [
+                'tenant_id' => $tenant->id,
+                'domain' => $tenant->domain,
+            ]);
+            return null;
+        }
+        
         return $tenant;
     }
     
